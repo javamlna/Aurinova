@@ -20,7 +20,7 @@ FRONTEND_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 
 
 load_dotenv()
 clustering_summary_cache = ""
-app = Flask(__name__, static_folder='../static')
+app = Flask(__name__, static_folder='../frontend', static_url_path='')
 CORS(app)
 
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
@@ -115,7 +115,7 @@ def query_openrouter(prompt):
 
 @app.route('/')
 def home():
-    return send_from_directory('../frontend', 'index.html')
+    return send_from_directory(FRONTEND_FOLDER, 'index.html')
 
 
 @app.route('/chat', methods=['POST'])

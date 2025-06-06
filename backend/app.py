@@ -20,7 +20,7 @@ FRONTEND_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 
 
 load_dotenv()
 clustering_summary_cache = ""
-app = Flask(__name__)
+app = Flask(__name__, static_folder='frontend', static_url_path='')
 CORS(app)
 
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
@@ -112,15 +112,11 @@ def query_openrouter(prompt):
     except Exception as e:
         return f"Gagal mengakses OpenRouter: {str(e)}"
     
-app = Flask(__name__, static_folder=FRONTEND_FOLDER)
 
 @app.route('/')
-def serve_index():
-    return send_from_directory(FRONTEND_FOLDER, 'index.html')
+def index():
+    return app.send_static_file('index.html')
 
-@app.route('/<path:filename>')
-def serve_static_files(filename):
-    return send_from_directory(FRONTEND_FOLDER, filename)
 
 @app.route('/chat', methods=['POST'])
 def chat():

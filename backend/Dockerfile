@@ -1,19 +1,20 @@
+# Gunakan image Python
 FROM python:3.11-slim
 
-# Buat working dir
+# Set working directory
 WORKDIR /app
 
-# Copy isi folder backend ke dalam /app
+# Copy seluruh isi project ke /app (build context = root)
 COPY . .
 
-# Copy frontend (relatif dari posisi Docker build context = root proyek)
-COPY ../frontend ./frontend
+# Set working directory ke dalam folder backend
+WORKDIR /app/backend
 
-# Install dependencies
+# Install dependencies backend
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port
+# Expose port untuk backend
 EXPOSE 5000
 
-# Jalankan Flask
+# Jalankan aplikasi backend
 CMD ["python", "app.py"]

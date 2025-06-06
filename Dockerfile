@@ -16,7 +16,7 @@ COPY . .
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
 # Buka port 5000
-EXPOSE 5000
+EXPOSE 8080
 
 # Jalankan Flask app dari backend/app.py
 CMD ["python", "backend/app.py"]

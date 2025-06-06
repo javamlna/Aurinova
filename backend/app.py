@@ -12,6 +12,7 @@ import json
 from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
+from flask import send_from_directory
 
 load_dotenv()
 clustering_summary_cache = ""
@@ -106,6 +107,15 @@ def query_openrouter(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Gagal mengakses OpenRouter: {str(e)}"
+    
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists("build/" + path):
+        return send_from_directory('build', path)
+    else:
+        return send_from_directory('build', 'index.html')
+  
 
 @app.route('/chat', methods=['POST'])
 def chat():

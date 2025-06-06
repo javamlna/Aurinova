@@ -13,6 +13,10 @@ from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
 from flask import send_from_directory
+from flask import render_template
+
+
+FRONTEND_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend'))
 
 load_dotenv()
 clustering_summary_cache = ""
@@ -108,14 +112,15 @@ def query_openrouter(prompt):
     except Exception as e:
         return f"Gagal mengakses OpenRouter: {str(e)}"
     
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    if path != "" and os.path.exists("build/" + path):
-        return send_from_directory('build', path)
-    else:
-        return send_from_directory('build', 'index.html')
-  
+app = Flask(__name__, static_folder=FRONTEND_FOLDER)
+
+@app.route('/')
+def serve_index():
+    return send_from_directory(FRONTEND_FOLDER, 'index.html')
+
+@app.route('/<path:filename>')
+def serve_static_files(filename):
+    return send_from_directory(FRONTEND_FOLDER, filename)
 
 @app.route('/chat', methods=['POST'])
 def chat():

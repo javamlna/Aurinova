@@ -16,11 +16,12 @@ from flask import send_from_directory
 from flask import render_template
 
 
-FRONTEND_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend'))
+FRONTEND_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+FRONTEND_FOLDER = os.path.abspath(FRONTEND_FOLDER)
 
 load_dotenv()
 clustering_summary_cache = ""
-app = Flask(__name__, static_folder='../frontend', static_url_path='')
+app = Flask(__name__, static_folder=FRONTEND_FOLDER, static_url_path='')
 CORS(app)
 
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")

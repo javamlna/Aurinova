@@ -189,12 +189,12 @@ def upload_file():
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(df_scaled)
 
-    plt.figure(figsize=(8,6)) # Ukuran figure
+    plt.figure(figsize=(10,7)) # Ukuran figure
 
     unique_clusters = np.unique(clusters)
     num_clusters_to_color = len(unique_clusters)
     
-    # Gunakan colormap 'tab10' atau 'Set1' untuk warna yang lebih distinct
+
     cmap = cm.get_cmap('tab10', num_clusters_to_color) # Menggunakan 'tab10'
 
     for i, cluster_label in enumerate(unique_clusters):
@@ -215,19 +215,18 @@ def upload_file():
     plt.ylabel('PCA 2')
     plt.title(f'Clustering Result ({algo}, k={len(set(clusters))})') # Judul plot
 
-    # >>>>>> MODIFIKASI UNTUK PENEMPATAN LEGEND <<<<<<
+
     plt.legend(
         loc='lower center', # Posisikan legenda di bagian bawah tengah
         bbox_to_anchor=(0.5, -0.25), # Geser legenda ke bawah dari bawah plot
-        ncol=len(unique_clusters), # Jumlah kolom legenda (satu per klaster untuk efisiensi)
+        ncol=max(1, min(len(unique_clusters), 4)), # Jumlah kolom legenda (satu per klaster untuk efisiensi)
         fancybox=True, # Efek box yang lebih bagus
         shadow=True # Efek bayangan
     )
     
     # Sesuaikan margin bawah plot agar ada ruang untuk legenda
-    plt.subplots_adjust(bottom=0.25) 
+    plt.subplots_adjust(bottom=0.25, right=0.95) 
     plt.grid(True) # Tambahkan grid untuk keterbacaan yang lebih baik
-    # >>>>>> AKHIR MODIFIKASI UNTUK PENEMPATAN LEGEND <<<<<<
 
     plt.savefig(img_path) 
     plt.close()

@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_file
 import pandas as pd
 import numpy as np
 import requests
-import uuid # Pastikan uuid diimpor
+import uuid 
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.decomposition import PCA
@@ -193,19 +193,18 @@ def upload_file():
     plt.xlabel('PCA 1')
     plt.ylabel('PCA 2')
     plt.title(f'Clustering Result ({algo}, k={len(set(clusters))})')
-    # Gunakan img_path yang baru dibuat di dalam fungsi
+
     plt.savefig(img_path) 
     plt.close()
 
-    # Gunakan result_csv_path yang baru dibuat di dalam fungsi
     df.to_csv(result_csv_path, index=False)
 
     cluster_counts = {str(c): int(sum(clusters == c)) for c in set(clusters)}
 
     return jsonify({
         'clusters': cluster_counts,
-        'plot_url': f'/download/plot/{unique_id}', # Pastikan unique_id adalah yang baru
-        'csv_url': f'/download/csv/{unique_id}', # Pastikan unique_id adalah yang baru
+        'plot_url': f'/download/plot/{unique_id}',
+        'csv_url': f'/download/csv/{unique_id}', 
         'features': feature_cols,
         'uid': unique_id
     })

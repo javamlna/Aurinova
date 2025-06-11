@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_file
 import pandas as pd
 import numpy as np
 import requests
-import uuid
+import uuid # Pastikan uuid diimpor
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.decomposition import PCA
@@ -31,9 +31,11 @@ UPLOAD_FOLDER = './uploads'
 RESULT_FOLDER = './results'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
-unique_id = str(uuid.uuid4())
-img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
-result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
+
+# HAPUS BARIS INI DARI GLOBAL SCOPE:
+# unique_id = str(uuid.uuid4())
+# img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
+# result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
 
 
 def clean_and_fill_mean(df):
@@ -48,8 +50,6 @@ def normalize(df, feature_cols):
     scaler = StandardScaler()
     df_scaled = pd.DataFrame(scaler.fit_transform(df[feature_cols]), columns=feature_cols)
     return df_scaled
-
-
 
 def encode_categorical(df, feature_cols):
     numeric_cols = df[feature_cols].select_dtypes(include=[np.number]).columns.tolist()
@@ -90,27 +90,25 @@ def generate_summary(df, feature_cols, algorithm, n_clusters):
             for col in feature_cols:
                 try:
                     mean_val = cluster_data[col].astype(float).mean()
-                    summary += f"  • {col}: {mean_val:.2f}\n"
+                    summary += f" {col}: {mean_val:.2f}\n"
                 except:
-                    summary += f"  • {col}: [bukan numerik]\n"
+                    summary += f" {col}: [bukan numerik]\n"
     return summary
 
 def query_openrouter(prompt):
     try:
         response = client.chat.completions.create(
-            model="openai/gpt-4o-mini",
+        model="openai/gpt-4o-mini",
             messages=[
                 {
                     "role": "user",
                     "content": prompt
-                }
-            ],
-        )
+                    }
+                ],
+                )
         return response.choices[0].message.content
     except Exception as e:
         return f"Gagal mengakses OpenRouter: {str(e)}"
-    
-
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -124,18 +122,21 @@ def chat():
     Berikut adalah ringkasan hasil clustering yang telah dilakukan:
 
     {clustering_summary_cache}
-
     Sekarang user ingin bertanya:
 
     User: {user_message}
     AI: Jawab berdasarkan hasil clustering di atas secara ringkas dan jelas.
     """
-
     ai_reply = query_openrouter(prompt)
     return jsonify({'reply': ai_reply})
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    unique_id = str(uuid.uuid4()) # Generate unique_id di setiap permintaan
+    img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
+    result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
+
+
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
@@ -143,7 +144,7 @@ def upload_file():
         return jsonify({'error': 'No selected file'}), 400
     filename = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filename)
-
+    
     try:
         df = pd.read_csv(filename)
     except Exception as e:
@@ -176,10 +177,10 @@ def upload_file():
     if algo == 'kmeans':
         if not n_clusters:
             n_clusters = elbow_method(df_scaled)
-        model = KMeans(n_clusters=n_clusters, random_state=42)
-        clusters = model.fit_predict(df_scaled)
-    elif algo == 'dbscan':
-        model = DBSCAN(eps=0.5, min_samples=5)
+            model = KMeans(n_clusters=n_clusters, random_state=42)
+            clusters = model.fit_predict(df_scaled)
+        elif algo == 'dbscan':
+            model = DBSCAN(eps=0.5, min_samples=5)
         clusters = model.fit_predict(df_scaled)
     else:
         return jsonify({'error': f'Algorithm {algo} not supported'}), 400
@@ -196,19 +197,19 @@ def upload_file():
     plt.xlabel('PCA 1')
     plt.ylabel('PCA 2')
     plt.title(f'Clustering Result ({algo}, k={len(set(clusters))})')
-    img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
-    plt.savefig(img_path)
+    # Gunakan img_path yang baru dibuat di dalam fungsi
+    plt.savefig(img_path) 
     plt.close()
 
-    result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
+    # Gunakan result_csv_path yang baru dibuat di dalam fungsi
     df.to_csv(result_csv_path, index=False)
 
     cluster_counts = {str(c): int(sum(clusters == c)) for c in set(clusters)}
 
     return jsonify({
         'clusters': cluster_counts,
-        'plot_url': f'/download/plot/{unique_id}',
-        'csv_url': f'/download/csv/{unique_id}',
+        'plot_url': f'/download/plot/{unique_id}', # Pastikan unique_id adalah yang baru
+        'csv_url': f'/download/csv/{unique_id}', # Pastikan unique_id adalah yang baru
         'features': feature_cols,
         'uid': unique_id
     })
@@ -246,5 +247,4 @@ def home():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))

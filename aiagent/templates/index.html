@@ -377,7 +377,7 @@ async function sendMessage() {
   
   // Kirim pesan ke backend AI agent
   try {
-    const response = await fetch('http://localhost:5000/chat', {
+    const response = await fetch('/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text })
@@ -420,7 +420,7 @@ async function sendMessage() {
       document.getElementById('downloadCsv').style.display = 'none';
 
       try {
-        const response = await fetch('http://localhost:5000/upload', {
+        const response = await fetch('/upload', {
           method: 'POST',
           body: formData
         });
@@ -451,11 +451,11 @@ async function sendMessage() {
         if (data.unique_values) overviewDiv.appendChild(createTableFromObject(data.unique_values, 'Nilai Unik per Fitur'));
 
         const img = document.getElementById('clusterPlot');
-        img.src = 'http://localhost:5000' + data.plot_url + '?' + new Date().getTime();
+        img.src = data.plot_url + '?' + new Date().getTime();
         img.style.display = 'block';
 
         const downloadCsv = document.getElementById('downloadCsv');
-        downloadCsv.href = 'http://localhost:5000' + data.csv_url;
+        downloadCsv.href = data.csv_url;
         downloadCsv.style.display = 'inline-block';
       } catch (error) {
         overviewDiv.textContent = 'Error: ' + error.message;

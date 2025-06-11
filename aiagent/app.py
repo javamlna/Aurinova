@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, render_template
 import pandas as pd
 import numpy as np
 import requests
@@ -7,20 +7,20 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import os
 import json
 from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
-from flask import send_from_directory
-from flask import render_template
-
+import matplotlib.cm as cm # Import matplotlib.cm untuk colormaps
 
 load_dotenv()
 clustering_summary_cache = ""
 app = Flask(__name__)
 CORS(app)
+
+# Konfigurasi batas ukuran konten untuk upload (misal: 100 MB)
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 
 
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 client = OpenAI(
@@ -32,7 +32,6 @@ UPLOAD_FOLDER = './uploads'
 RESULT_FOLDER = './results'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
-
 
 
 def clean_and_fill_mean(df):
@@ -87,22 +86,22 @@ def generate_summary(df, feature_cols, algorithm, n_clusters):
             for col in feature_cols:
                 try:
                     mean_val = cluster_data[col].astype(float).mean()
-                    summary += f" {col}: {mean_val:.2f}\n"
+                    summary += f"   • {col}: {mean_val:.2f}\n"
                 except:
-                    summary += f" {col}: [bukan numerik]\n"
+                    summary += f"   • {col}: [bukan numerik]\n"
     return summary
 
 def query_openrouter(prompt):
     try:
         response = client.chat.completions.create(
-        model="openai/gpt-4o-mini",
+            model="openai/gpt-4o-mini",
             messages=[
                 {
                     "role": "user",
                     "content": prompt
-                    }
-                ],
-                )
+                }
+            ],
+        )
         return response.choices[0].message.content
     except Exception as e:
         return f"Gagal mengakses OpenRouter: {str(e)}"
@@ -119,6 +118,7 @@ def chat():
     Berikut adalah ringkasan hasil clustering yang telah dilakukan:
 
     {clustering_summary_cache}
+
     Sekarang user ingin bertanya:
 
     User: {user_message}
@@ -129,7 +129,7 @@ def chat():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    # Generate unique_id di setiap permintaan
+    # Generate unique_id per request
     unique_id = str(uuid.uuid4())
     img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
     result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
@@ -139,13 +139,24 @@ def upload_file():
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
+    
+    # Save file to temporary location first
     filename = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filename)
+
+    # Dapatkan delimiter dari frontend (default koma)
+    file_delimiter = request.form.get('delimiter', ',')
     
     try:
-        df = pd.read_csv(filename)
-    except Exception as e: # Indentasi sudah benar
-        return jsonify({'error': 'Failed to read CSV file'}), 400
+        # Coba membaca CSV dengan encoding UTF-8, jika gagal coba latin1
+        df = pd.read_csv(filename, encoding='utf-8', sep=file_delimiter)
+    except UnicodeDecodeError:
+        try:
+            df = pd.read_csv(filename, encoding='latin1', sep=file_delimiter)
+        except Exception as e:
+            return jsonify({'error': f'Failed to read CSV file with common encodings: {str(e)}'}), 400
+    except Exception as e: # Catch error selain UnicodeDecodeError (misal ParserError)
+        return jsonify({'error': f'Failed to read CSV file: {str(e)}'}), 400
 
     features = request.form.get('features', None)
     if not features:
@@ -168,18 +179,18 @@ def upload_file():
     if n_clusters:
         try:
             n_clusters = int(n_clusters)
-        except: # Indentasi sudah benar
-            n_clusters = None
+        except ValueError: # Tangani jika konversi ke int gagal
+            n_clusters = None # Kembali ke auto-detection
 
     if algo == 'kmeans':
         if not n_clusters:
             n_clusters = elbow_method(df_scaled)
         model = KMeans(n_clusters=n_clusters, random_state=42)
         clusters = model.fit_predict(df_scaled)
-    elif algo == 'dbscan': # Indentasi sudah benar
+    elif algo == 'dbscan':
         model = DBSCAN(eps=0.5, min_samples=5)
         clusters = model.fit_predict(df_scaled)
-    else: # Indentasi sudah benar
+    else:
         return jsonify({'error': f'Algorithm {algo} not supported'}), 400
 
     df['cluster'] = clusters
@@ -189,13 +200,13 @@ def upload_file():
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(df_scaled)
 
-    plt.figure(figsize=(10,7)) # Ukuran figure
+    plt.figure(figsize=(10, 7)) # Ukuran figure lebih lebar untuk legenda
 
     unique_clusters = np.unique(clusters)
     num_clusters_to_color = len(unique_clusters)
     
-
-    cmap = cm.get_cmap('tab10', num_clusters_to_color) # Menggunakan 'tab10'
+    # Menggunakan colormap 'tab10' untuk warna yang lebih distinct
+    cmap = cm.get_cmap('tab10', num_clusters_to_color) 
 
     for i, cluster_label in enumerate(unique_clusters):
         cluster_points = pca_result[clusters == cluster_label]
@@ -213,20 +224,21 @@ def upload_file():
 
     plt.xlabel('PCA 1')
     plt.ylabel('PCA 2')
-    plt.title(f'Clustering Result ({algo}, k={len(set(clusters))})') # Judul plot
+    plt.title(f'Clustering Result ({algo}, k={len(set(clusters))})') 
 
-
+    # >>>>>> MODIFIKASI UNTUK PENEMPATAN LEGEND <<<<<<
     plt.legend(
         loc='lower center', # Posisikan legenda di bagian bawah tengah
         bbox_to_anchor=(0.5, -0.25), # Geser legenda ke bawah dari bawah plot
-        ncol=max(1, min(len(unique_clusters), 4)), # Jumlah kolom legenda (satu per klaster untuk efisiensi)
+        ncol=max(1, min(len(unique_clusters), 4)), # Batasi kolom legenda maksimal 4
         fancybox=True, # Efek box yang lebih bagus
         shadow=True # Efek bayangan
     )
     
-    # Sesuaikan margin bawah plot agar ada ruang untuk legenda
+    # Sesuaikan margin bawah dan kanan plot agar ada ruang untuk legenda
     plt.subplots_adjust(bottom=0.25, right=0.95) 
-    plt.grid(True) # Tambahkan grid untuk keterbacaan yang lebih baik
+    plt.grid(True) 
+    # >>>>>> AKHIR MODIFIKASI UNTUK PENEMPATAN LEGEND <<<<<<
 
     plt.savefig(img_path) 
     plt.close()
@@ -276,4 +288,5 @@ def home():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

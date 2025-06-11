@@ -290,6 +290,8 @@
 </div>
   </div>
   <script>
+    let detectedDelimiter = ','; 
+
     function loadCSVHeaders() {
       const input = document.getElementById('fileInput');
       if (input.files.length === 0) return;
@@ -298,15 +300,22 @@
       reader.onload = function(e) {
         const lines = e.target.result.split('\n');
         const firstLine = lines[0];
-        let delimiter = ','; // Default
-        if (firstLine.includes(';')) {
-            delimiter = ';';
+        
+        if (firstLine.includes(',')) {
+            detectedDelimiter = ',';
+        } else if (firstLine.includes(';')) {
+            detectedDelimiter = ';';
         } else if (firstLine.includes('\t')) {
-            delimiter = '\t';
-      }
-        const headers = firstLine.split(delimiter).map(h => h.trim());
-        const container = document.getElementById('featureCheckboxes');
-        container.innerHTML = '';
+            detectedDelimiter = '\t';
+        } else {
+            detectedDelimiter = ','; // Default ke koma jika tidak ada yang terdeteksi
+        }
+
+        const headers = firstLine.split(detectedDelimiter).map(h => h.trim());
+
+        const featureCheckboxesContainer = document.getElementById('featureCheckboxes');
+        featureCheckboxesContainer.innerHTML = '';
+        
         headers.forEach(h => {
           const label = document.createElement('label');
           const checkbox = document.createElement('input');
@@ -314,7 +323,7 @@
           checkbox.value = h;
           label.appendChild(checkbox);
           label.appendChild(document.createTextNode(' ' + h));
-          container.appendChild(label);
+          featureCheckboxesContainer.appendChild(label);
         });
       };
       reader.readAsText(input.files[0]);
@@ -365,7 +374,6 @@
     messageDiv.textContent = message;  
   } else {
     messageDiv.classList.add('bot');
-    // render markdown dari backend
     messageDiv.innerHTML = `<strong>AI Agent:</strong> ${marked.parse(message).replace(/<p>|<\/p>/g, '')}`;
   }
 
@@ -407,6 +415,7 @@ async function sendMessage() {
       const file = input.files[0];
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('delimiter', detectedDelimiter); 
       const algorithm = document.getElementById('algorithm').value;
       formData.append('algorithm', algorithm);
       const nClusters = document.getElementById('nClusters').value;
@@ -423,6 +432,7 @@ async function sendMessage() {
       overviewDiv.innerHTML = 'Processing...';
       document.getElementById('clusterPlot').style.display = 'none';
       document.getElementById('downloadCsv').style.display = 'none';
+      document.getElementById('downloadPlot').style.display = 'none'; 
 
       try {
         const response = await fetch('/upload', {
@@ -430,7 +440,10 @@ async function sendMessage() {
           body: formData
         });
 
-        if (!response.ok) throw new Error('Upload failed');
+        if (!response.ok) {
+          const errorText = await response.text(); 
+          throw new Error('Upload failed: ' + errorText);
+        }
 
         const data = await response.json();
         overviewDiv.innerHTML = '';
@@ -456,12 +469,16 @@ async function sendMessage() {
         if (data.unique_values) overviewDiv.appendChild(createTableFromObject(data.unique_values, 'Nilai Unik per Fitur'));
 
         const img = document.getElementById('clusterPlot');
-        img.src = data.plot_url + '?' + new Date().getTime();
+        img.src = data.plot_url + '?' + new Date().getTime(); // Tambahkan timestamp untuk menghindari cache
         img.style.display = 'block';
 
         const downloadCsv = document.getElementById('downloadCsv');
         downloadCsv.href = data.csv_url;
         downloadCsv.style.display = 'inline-block';
+
+        const downloadPlot = document.getElementById('downloadPlot');
+        downloadPlot.href = data.plot_url;
+        downloadPlot.style.display = 'inline-block'; // Tampilkan tombol download plot
       } catch (error) {
         overviewDiv.textContent = 'Error: ' + error.message;
       }

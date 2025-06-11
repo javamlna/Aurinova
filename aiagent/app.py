@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import os
 import json
 from flask_cors import CORS
@@ -128,10 +129,10 @@ def chat():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    unique_id = str(uuid.uuid4()) # Generate unique_id di setiap permintaan
+    # Generate unique_id di setiap permintaan
+    unique_id = str(uuid.uuid4())
     img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
     result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
-
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -143,7 +144,7 @@ def upload_file():
     
     try:
         df = pd.read_csv(filename)
-    except Exception as e:
+    except Exception as e: # Indentasi sudah benar
         return jsonify({'error': 'Failed to read CSV file'}), 400
 
     features = request.form.get('features', None)
@@ -167,18 +168,18 @@ def upload_file():
     if n_clusters:
         try:
             n_clusters = int(n_clusters)
-        except:
+        except: # Indentasi sudah benar
             n_clusters = None
 
     if algo == 'kmeans':
         if not n_clusters:
             n_clusters = elbow_method(df_scaled)
-            model = KMeans(n_clusters=n_clusters, random_state=42)
-            clusters = model.fit_predict(df_scaled)
-        elif algo == 'dbscan':
-            model = DBSCAN(eps=0.5, min_samples=5)
+        model = KMeans(n_clusters=n_clusters, random_state=42)
         clusters = model.fit_predict(df_scaled)
-    else:
+    elif algo == 'dbscan': # Indentasi sudah benar
+        model = DBSCAN(eps=0.5, min_samples=5)
+        clusters = model.fit_predict(df_scaled)
+    else: # Indentasi sudah benar
         return jsonify({'error': f'Algorithm {algo} not supported'}), 400
 
     df['cluster'] = clusters
@@ -188,11 +189,45 @@ def upload_file():
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(df_scaled)
 
-    plt.figure(figsize=(8,6))
-    plt.scatter(pca_result[:,0], pca_result[:,1], c=clusters, cmap='viridis')
+    plt.figure(figsize=(8,6)) # Ukuran figure
+
+    unique_clusters = np.unique(clusters)
+    num_clusters_to_color = len(unique_clusters)
+    
+    # Gunakan colormap 'tab10' atau 'Set1' untuk warna yang lebih distinct
+    cmap = cm.get_cmap('tab10', num_clusters_to_color) # Menggunakan 'tab10'
+
+    for i, cluster_label in enumerate(unique_clusters):
+        cluster_points = pca_result[clusters == cluster_label]
+        legend_label = f'Cluster {cluster_label}'
+        if cluster_label == -1: # Handle klaster noise dari DBSCAN (label -1)
+            legend_label = 'Noise (-1)'
+        plt.scatter(
+            cluster_points[:, 0],
+            cluster_points[:, 1],
+            color=cmap(i), # Ambil warna dari colormap berdasarkan indeks
+            label=legend_label,
+            s=50, # Ukuran marker (opsional)
+            alpha=0.8 # Transparansi (opsional)
+        )
+
     plt.xlabel('PCA 1')
     plt.ylabel('PCA 2')
-    plt.title(f'Clustering Result ({algo}, k={len(set(clusters))})')
+    plt.title(f'Clustering Result ({algo}, k={len(set(clusters))})') # Judul plot
+
+    # >>>>>> MODIFIKASI UNTUK PENEMPATAN LEGEND <<<<<<
+    plt.legend(
+        loc='lower center', # Posisikan legenda di bagian bawah tengah
+        bbox_to_anchor=(0.5, -0.25), # Geser legenda ke bawah dari bawah plot
+        ncol=len(unique_clusters), # Jumlah kolom legenda (satu per klaster untuk efisiensi)
+        fancybox=True, # Efek box yang lebih bagus
+        shadow=True # Efek bayangan
+    )
+    
+    # Sesuaikan margin bawah plot agar ada ruang untuk legenda
+    plt.subplots_adjust(bottom=0.25) 
+    plt.grid(True) # Tambahkan grid untuk keterbacaan yang lebih baik
+    # >>>>>> AKHIR MODIFIKASI UNTUK PENEMPATAN LEGEND <<<<<<
 
     plt.savefig(img_path) 
     plt.close()

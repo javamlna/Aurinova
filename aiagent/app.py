@@ -32,10 +32,6 @@ RESULT_FOLDER = './results'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
 
-# HAPUS BARIS INI DARI GLOBAL SCOPE:
-# unique_id = str(uuid.uuid4())
-# img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
-# result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
 
 
 def clean_and_fill_mean(df):

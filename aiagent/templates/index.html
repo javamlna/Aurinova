@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aurinova</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="AURINOVALOGO.png" type="image/png" />
+  <link rel="icon" href="{{ url_for('static', filename='images/AURINOVALOGO.png') }}" type="image/png" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     body {
@@ -297,8 +297,14 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const lines = e.target.result.split('\n');
-        const headers = lines[0].split(',').map(h => h.trim());
-
+        const firstLine = lines[0];
+        let delimiter = ','; // Default
+        if (firstLine.includes(';')) {
+            delimiter = ';';
+        } else if (firstLine.includes('\t')) {
+            delimiter = '\t';
+      }
+        const headers = firstLine.split(delimiter).map(h => h.trim());
         const container = document.getElementById('featureCheckboxes');
         container.innerHTML = '';
         headers.forEach(h => {
@@ -356,7 +362,7 @@
 
   if (sender === 'user') {
     messageDiv.classList.add('user');
-    messageDiv.textContent = message;  // plain text
+    messageDiv.textContent = message;  
   } else {
     messageDiv.classList.add('bot');
     // render markdown dari backend
@@ -375,7 +381,6 @@ async function sendMessage() {
   appendMessage('user', text);
   input.value = '';
   
-  // Kirim pesan ke backend AI agent
   try {
     const response = await fetch('/chat', {
       method: 'POST',
@@ -463,7 +468,7 @@ async function sendMessage() {
     }
     document.getElementById('chatInput').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') {
-    e.preventDefault(); // Mencegah form submit default jika ada
+    e.preventDefault(); 
     sendMessage();
   }
 });

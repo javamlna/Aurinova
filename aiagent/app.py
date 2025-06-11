@@ -240,6 +240,10 @@ def clustering_summary():
         return jsonify({'summary': summary})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+    
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

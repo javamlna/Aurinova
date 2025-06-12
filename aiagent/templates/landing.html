@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurinova - Jelajahi Data dengan Percakapan</title>
+    <title>Aurinova</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="{{ url_for('static', filename='images/logobrr.png') }}" type="image/png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0V4LLanw2qksYuMGFQxHEpQw/N7L7x/g/t/V0+QY/W6y4FfVn5y6M0/Y0A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -130,6 +131,45 @@
             transform: translateY(-3px);
             box-shadow: 0 12px 20px rgba(0, 191, 166, 0.4);
         }
+        .footer {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #009e8f;
+            color: white;
+            font-size: 0.85em;
+            text-align: right;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 0;
+        }
+
+        .footer p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .footer a { /* Style untuk link di footer */
+            color: #00BFA6; /* Warna link yang cerah */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #009e8f; /* Warna hover */
+            text-decoration: underline;
+        }
+        
+        .social-icon {
+        font-size: 1.5em; /* Ukuran ikon */
+        color: white; /* Warna ikon putih */
+        margin: 0 5px; /* Jarak antar ikon jika ada lebih dari satu */
+        transition: color 0.3s ease;
+    }
+
+    .social-icon:hover {
+        color: #00BFA6; /* Warna ikon saat di-hover */
+    }
 
         
         @media (max-width: 768px) {
@@ -201,5 +241,14 @@
 
         <a href="{{ url_for('main_app') }}" class="start-button">Mulai Sekarang</a> 
     </div>
+    <footer class="footer">
+        <p>&copy; 2025 Aurinova. All rights reserved.</p>
+        <p>
+            <a href="https://www.instagram.com/javamlna/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <i class="fab fa-instagram social-icon"></i>
+            </a>
+        </p>
+        <p>Aplikasi ini dikembangkan untuk tujuan demo dan pembelajaran.</p>
+    </footer>
 </body>
 </html>

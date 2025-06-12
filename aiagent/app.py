@@ -105,6 +105,14 @@ def query_openrouter(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Gagal mengakses OpenRouter: {str(e)}"
+    
+@app.route('/')
+def landing_page():
+    return render_template('landing.html')
+
+@app.route('/app')
+def main_app():
+    return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurinova - Jelajahi Data dengan Percakapan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='images/AURINOVALOGO.png') }}" type="image/png" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fdf7f0; 
+            display: flex;
+            flex-direction: column; 
+            justify-content: flex-start; 
+            align-items: center; 
+            min-height: 100vh; 
+            width: 100vw; /* Lebar 100% viewport */
+            overflow-x: hidden; /* Mencegah scrollbar horizontal yang tidak diinginkan */
+            color: #333;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* Bagian Atas Biru */
+        .top-green-section {
+            background-color: #00BFA6; /* Warna biru mirip gambar */
+            color: white;
+            padding: 40px 20px 100px 10px; /* Padding bawah lebih besar agar kotak putih masuk */
+            width: 100%;
+            max-width: 1700px; /* Batasi lebar maksimal jika terlalu lebar */
+            box-sizing: border-box;
+            border-bottom-left-radius: 10px; /* Sedikit melengkung di kiri bawah */
+            border-bottom-right-radius: 10px; /* Sedikit melengkung di kanan bawah */
+            position: relative; /* Untuk posisi kotak putih */
+            z-index: 1; /* Agar kotak putih bisa di atasnya */
+        }
+
+        .top-green-section h1 {
+            font-size: 4em; /* Ukuran font lebih besar */
+            margin-bottom: 3px;
+            margin-top: 1px;
+            letter-spacing: -2px;
+        }
+
+        .top-green-section .tagline {
+            font-size: 1.6em;
+            line-height: 1.5;
+            max-width: 1000px; /* Batasi lebar tagline */
+            margin: 0 auto;
+        }
+
+        /* Kontainer Kotak Putih Utama */
+        .main-container-content {
+            background-color: #ffffff;
+            padding: 20px 40px; /* Padding di dalam kotak putih */
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 2000px; /* Lebar maksimal untuk kotak putih */
+            width: 95%; /* Ambil 90% lebar viewport */
+            margin-top: -50px; /* Geser ke atas agar menumpuk di bagian biru */
+            position: relative;
+            z-index: 3; /* Di atas bagian biru */
+            box-sizing: border-box;
+        }
+
+        /* Tata Letak Fitur 2x2 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Default 2 kolom */
+            gap: 50px; 
+            margin-top: 30px;
+            margin-bottom: 50px;
+            justify-content: center;
+        }
+
+        .feature-item {
+            background-color: #f8fcfd;
+            padding: 35px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        .feature-item img {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+        }
+        .feature-item h3 {
+            color: #34495e;
+            font-size: 1.3em;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        .feature-item p {
+            font-size: 0.95em;
+            color: #7f8c8d;
+            margin-bottom: 0;
+        }
+
+        /* Tombol "Mulai Sekarang" */
+        .start-button {
+            background-color: #00BFA6;
+            color: white;
+            padding: 18px 45px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.6em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-block;
+            box-shadow: 0 8px 15px rgba(0, 191, 166, 0.3);
+        }
+        .start-button:hover {
+            background-color: #009e8f;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 191, 166, 0.4);
+        }
+
+        /* Media Queries untuk Responsif */
+        @media (max-width: 768px) {
+            .top-green-section {
+                padding: 40px 15px 80px 15px;
+            }
+            .top-green-section h1 {
+                font-size: 3em;
+            }
+            .top-green-section .tagline {
+                font-size: 1.2em;
+            }
+            .main-container-content {
+                padding: 30px 20px;
+                margin-top: -40px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr; /* Satu kolom di layar kecil */
+                gap: 20px;
+            }
+            .feature-item {
+                padding: 20px 15px;
+            }
+            .start-button {
+                font-size: 1.4em;
+                padding: 15px 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .top-green-section h1 {
+                font-size: 2.5em;
+            }
+            .top-green-section .tagline {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-green-section">
+        <h1>Aurinova</h1>
+        <p class="tagline">Clustering Interaktif dengan Chatbot AI - Jelajahi Data dengan Percakapan</p>
+    </div>
+
+    <div class="main-container-content">
+        <div class="features-grid">
+            <div class="feature-item">
+                <img src="{{ url_for('static', filename='images/upload.png') }}" alt="Upload Icon">
+                <h3>Upload Dataset</h3>
+                <p>Mudah unggah file CSV dan mulai eksplorasi data kamu dalam hitungan detk.</p>
+            </div>
+            <div class="feature-item">
+                <img src="{{ url_for('static', filename='images/algo.png') }}" alt="Algorithm Icon">
+                <h3>Pilih Algoritma</h3>
+                <p>Dukungan K-Means dan DBSCAN untuk hasil klasterisasi yang fleksibel</p>
+            </div>
+            <div class="feature-item">
+                <img src="{{ url_for('static', filename='images/visual.png') }}" alt="Visualization Icon">
+                <h3>Visualisasi Dinamis</h3>
+                <p>Tampilkan scatter plot, elbow method dan hasil cluster secara visual</p>
+            </div>
+            <div class="feature-item">
+                <img src="{{ url_for('static', filename='images/chatbot') }}" alt="Chatbot Icon">
+                <h3>Chatbot AI</h3>
+                <p>Berinteraksi langsung dengan agen AI untuk memahami hasil dan insight</p>
+            </div>
+        </div>
+
+        <a href="{{ url_for('main_app') }}" class="start-button">Mulai Sekarang</a> 
+    </div>
+</body>
+</html>

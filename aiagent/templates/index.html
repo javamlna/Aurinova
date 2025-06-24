@@ -223,6 +223,39 @@
   overflow-x: auto;
 }
 
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 2px; 
+  padding: 10px 15px;
+  border-radius: 18px;
+  background-color: #F1F0F0; 
+  color: #000;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  max-width: 75%;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+.loading-indicator span {
+  display: inline-block;
+  width: 6px; /* Ukuran titik */
+  height: 6px; /* Ukuran titik */
+  background-color: #555; /* Warna titik */
+  border-radius: 50%;
+  opacity: 0;
+  animation: blink 1.4s infinite ease-in-out;
+}
+
+.loading-indicator span:nth-child(1) { animation-delay: 0s; }
+.loading-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.loading-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 75%, 100% { opacity: 0; }
+  25%, 50% { opacity: 1; }
+}
+
   </style>
 </head>
 <body>
@@ -308,7 +341,7 @@
         } else if (firstLine.includes('\t')) {
             detectedDelimiter = '\t';
         } else {
-            detectedDelimiter = ','; // Default ke koma jika tidak ada yang terdeteksi
+            detectedDelimiter = ',';
         }
 
         const headers = firstLine.split(detectedDelimiter).map(h => h.trim());
@@ -381,29 +414,58 @@
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+let loadingMessageDiv = null; 
+
+    function showLoadingIndicator() {
+        const chatBox = document.getElementById('chatBox');
+        loadingMessageDiv = document.createElement('div');
+        loadingMessageDiv.classList.add('message', 'bot', 'loading-indicator');
+        loadingMessageDiv.innerHTML = `
+            <span></span>
+            <span></span>
+            <span></span>
+        `;
+        chatBox.appendChild(loadingMessageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function removeLoadingIndicator() {
+        if (loadingMessageDiv && loadingMessageDiv.parentNode) {
+            loadingMessageDiv.parentNode.removeChild(loadingMessageDiv);
+            loadingMessageDiv = null;
+        }
+    }
+
 async function sendMessage() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
 
-  appendMessage('user', text);
-  input.value = '';
-  
-  try {
-    const response = await fetch('/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text })
-    });
+        appendMessage('user', text);
+        input.value = '';
 
-    if (!response.ok) throw new Error('Gagal terhubung ke AI Agent');
+        showLoadingIndicator(); // Tampilkan loading indicator
 
-    const data = await response.json();
-    appendMessage('agent', data.reply);
-  } catch (error) {
-    appendMessage('agent', 'Error: ' + error.message);
-  }
-}
+        try {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error('Gagal terhubung ke AI Agent: ' + errorText); // Tambahkan errorText untuk debugging
+            }
+
+            const data = await response.json();
+            removeLoadingIndicator(); // Hapus loading indicator sebelum menampilkan respons
+            appendMessage('agent', data.reply);
+        } catch (error) {
+            removeLoadingIndicator(); // Hapus loading indicator meskipun ada error
+            appendMessage('agent', 'Error: ' + error.message);
+        }
+    }
 
     async function upload() {
       const input = document.getElementById('fileInput');

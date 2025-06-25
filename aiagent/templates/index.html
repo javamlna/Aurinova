@@ -261,36 +261,36 @@
 <body>
   <div class="grid-container">
     <div class="panel upload-section">
-      <h2 style="text-align: center;">Upload Your Data</h2>
-      <label>Only Data CSV</label>
+      <h2 style="text-align: center;">Unggah Data</h2>
+      <label>Hanya Data CSV</label>
       <input type="file" id="fileInput" accept=".csv" onchange="loadCSVHeaders()" />
 
-      <label for="algorithm">Select Algorithm:</label>
+      <label for="algorithm">Pilih Algoritma:</label>
       <select id="algorithm">
         <option value="kmeans">K-Means</option>
         <option value="dbscan">DBSCAN</option>
       </select>
 
-      <label for="nClusters">Set Number of Clusters (Opsional):</label>
+      <label for="nClusters">Tetapkan Jumlah Cluster (Pilihan):</label>
       <input type="number" id="nClusters" min="1" />
 
       <label>Select Features:</label>
       <div id="featureCheckboxes" style="max-height: 200px; overflow-y: auto; margin-bottom:10px"></div>
 
-      <button onclick="upload()">Upload & Analyze</button>
+      <button onclick="upload()">Unggah & Analisis</button>
     </div>
     <div class="panel overview-section">
-      <h2 style="text-align: center;">Data Overview</h2>
+      <h2 style="text-align: center;">Gambaran Umum Data</h2>
       <div id="overviewTables"></div>
-      <a id="downloadCsv" href="#" download>Download File</a>
+      <a id="downloadCsv" href="#" download>Unduh File</a>
     </div>
     <div class="panel visual-section">
-      <h2 style="text-align: center;">Clustering Result</h2>
+      <h2 style="text-align: center;">Hasil Klasterisasi</h2>
       <img id="clusterPlot" />
-      <a id="downloadPlot" href="#" download>Download Plot</a>
+      <a id="downloadPlot" href="#" download>Unduh Gambar Plot</a>
     </div>
     <div class="panel chat-section">
-  <h2 style="text-align: center;">Chat With AI</h2>
+  <h2 style="text-align: center;">Obrolan dengan AI</h2>
 
   <div id="chatBox" style="border: 1px solid #ccc; height: 163px; overflow-y: auto; padding: 10px; background: #fff; border-radius: 6px; margin-left: 5px; margin-right: 5px;">
   </div>
@@ -510,12 +510,12 @@ async function sendMessage() {
         const data = await response.json();
         overviewDiv.innerHTML = '';
 
-        if (data.clusters) overviewDiv.appendChild(createTableFromObject(data.clusters, 'Number of Data per Cluster'));
+        if (data.clusters) overviewDiv.appendChild(createTableFromObject(data.clusters, 'Jumlah Data per Cluster'));
         if (data.features) {
           const featuresDiv = document.createElement('div');
           featuresDiv.style.marginBottom = '5px';
           const fTitle = document.createElement('h3');
-          fTitle.textContent = 'Selected Features';
+          fTitle.textContent = 'Pilih Fitur yang Digunakan';
           featuresDiv.appendChild(fTitle);
           const fList = document.createElement('ul');
           data.features.forEach(f => {

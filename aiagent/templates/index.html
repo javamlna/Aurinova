@@ -202,7 +202,13 @@
   color: #000;
   border-bottom-right-radius: 4px;
 }
-
+.message.bot {
+    align-self: flex-start; /* INI KUNCINYA AGAR POSISI KE KIRI */
+    background-color: #F1F0F0;
+    color: #000;
+    border-bottom-left-radius: 4px;
+    text-align: left;
+}
 .message.bot p,
 .message.bot ul,
 .message.bot ol,
@@ -216,8 +222,6 @@
 /* Aturan untuk mengembalikan padding kiri agar bullet/nomor list tetap rapi */
 .message.bot ul,
 .message.bot ol {
-/* Sedikit margin bawah antar list jika diperlukan, jika tidak, bisa dihapus */
-  margin-bottom: 10px; 
   padding-left: 20px;
 }
 

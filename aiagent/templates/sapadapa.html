@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-       body {
+        body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
@@ -357,7 +357,7 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
-        /* Style for simple upload button in modal */
+        
         .modal-content button {
             background-color: #00BFA6;
             color: white;
@@ -373,6 +373,7 @@
             background-color: #009e8f;
         }
 
+      
         .upload-plus-button {
             background: none;
             border: none;
@@ -387,7 +388,8 @@
             color: #009e8f;
         }
 
-        .upload-summary {
+       
+        .upload-summary { 
             background-color: #e0f2f1;
             border-left: 5px solid #00BFA6;
             padding: 15px;
@@ -457,17 +459,10 @@
         <h3>Coba Chatbot SAPADAPA Kami!</h3>
         <p>Unggah data CSV Anda untuk bertanya tentang isi datanya, atau tanyakan apa pun kepada AI tentang analisis data dan konsep umum.</p>
         
-        <div id="uploadSummaryDisplay" class="upload-summary" style="display:none;">
-            <h4>Data Berhasil Diunggah! Beberapa Baris Pertama:</h4>
-            <pre id="rawDataHeadText"></pre> <p style="text-align: right; margin-top: 10px;">
-                <a id="downloadOriginalCsv" href="#" download class="secondary-button" style="padding: 8px 15px; font-size: 0.9em; margin-top: 0;">Unduh Data Asli</a>
-            </p>
-        </div>
-
-
         <div id="chatBox">
             </div>
         <div class="chat-controls">
+            
             <input type="text" id="chatInput" placeholder="Tanyakan apa saja atau upload data Anda..." />
             <button class="upload-plus-button" onclick="openUploadModal()" aria-label="Upload Data">
                 <i class="fas fa-plus"></i>
@@ -475,7 +470,7 @@
             <button onclick="sendMessage()">Kirim</button>
         </div>
 
-        <a href="{{ url_for('main_app') }}" class="back-button">Mulai Klasterisasi</a>
+        <a href="{{ url_for('main_app') }}" class="back-button">Lanjut ke Aplikasi Klasterisasi Lengkap</a>
     </div>
 
     <footer class="footer">
@@ -523,12 +518,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (data.raw_data_head) { // If raw data head is available from cache
-                        document.getElementById('rawDataHeadText').textContent = data.raw_data_head;
-                        document.getElementById('uploadSummaryDisplay').style.display = 'block';
-                        
-                        // Update download link for original CSV
-                        document.getElementById('downloadOriginalCsv').href = data.original_csv_url;
-
+                        // NO LONGER DISPLAYING RAW DATA HEAD OR DOWNLOAD LINK
                         appendMessage('bot', 'Saya mendeteksi data yang telah Anda unggah sebelumnya. Sekarang Anda bisa bertanya tentang data ini (misal: "jelaskan kolom X", "ada berapa baris?"), atau pertanyaan umum lainnya!');
                     }
                 }
@@ -614,11 +604,10 @@
             }
         });
 
-        // --- Modal Upload Functions (Revised for simplicity) ---
+        // --- Modal Upload Functions ---
         function openUploadModal() {
             document.getElementById('uploadModal').style.display = 'flex';
             document.getElementById('uploadStatus').textContent = '';
-            // No feature checkboxes to clear anymore
             document.getElementById('modalFileInput').value = '';
         }
 
@@ -626,7 +615,7 @@
             document.getElementById('uploadModal').style.display = 'none';
         }
 
-        // loadModalCSVHeaders is now just for delimiter detection (no checkboxes needed)
+        // loadModalCSVHeaders is now just for delimiter detection
         function loadModalCSVHeaders() {
             const input = document.getElementById('modalFileInput');
             if (input.files.length === 0) return;
@@ -645,7 +634,6 @@
                 } else {
                     detectedDelimiter = ',';
                 }
-                // Removed all feature checkbox generation logic
             };
             reader.readAsText(input.files[0]);
         }
@@ -653,7 +641,7 @@
         async function uploadDataFromModal() {
             const fileInput = document.getElementById('modalFileInput');
             const uploadStatus = document.getElementById('uploadStatus');
-            uploadStatus.textContent = 'Mengunggah data...'; // Simpler status
+            uploadStatus.textContent = 'Mengunggah data...';
 
             if (fileInput.files.length === 0) {
                 uploadStatus.textContent = 'Mohon pilih file CSV terlebih dahulu!';
@@ -665,7 +653,6 @@
             formData.append('file', file);
             formData.append('delimiter', detectedDelimiter);
             formData.append('session_id', currentSessionId);
-            // No algorithm or feature selection sent from here
 
             try {
                 const response = await fetch('/upload', {
@@ -679,25 +666,20 @@
                 }
 
                 const data = await response.json();
-                uploadStatus.textContent = data.message; // Use message from backend
-                
-                // Display raw data head
-                if (data.raw_data_head) {
-                    document.getElementById('rawDataHeadText').textContent = data.raw_data_head;
-                    document.getElementById('uploadSummaryDisplay').style.display = 'block';
-                    document.getElementById('downloadOriginalCsv').href = data.original_csv_url; // Set original CSV download link
-                } else {
-                    document.getElementById('uploadSummaryDisplay').style.display = 'none';
-                }
                 
                 closeUploadModal();
-                appendMessage('bot', data.message); // Use message from backend
-                appendMessage('bot', 'Sekarang saya bisa menjawab pertanyaan tentang data ini (misal: "ada berapa baris?", "jelaskan kolom X"), atau topik lainnya yang Anda inginkan.');
+                sendMessageToAIForConfirmation(data.message); 
 
             } catch (error) {
                 uploadStatus.textContent = 'Error: ' + error.message;
                 console.error("Upload Error:", error);
             }
+        }
+
+        // Function to send an internal message to AI after successful upload
+        async function sendMessageToAIForConfirmation(uploadResponseMessage) {
+            // Append the confirmation message from the bot
+            appendMessage('bot', `Baik, data Anda berhasil diunggah! Saya sudah memprosesnya. Sekarang Anda bisa bertanya tentang data ini (misal: "ada berapa baris?", "kolom apa saja yang ada?"), atau topik lainnya yang Anda inginkan.`);
         }
     </script>
 </body>

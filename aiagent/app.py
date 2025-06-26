@@ -155,23 +155,24 @@ def chat():
     raw_data_head = current_session_data.get("raw_data_head", "")
     clustering_summary = current_session_data.get("summary", "")
 
+    # Logika chat untuk halaman SAPADAPA (GENERAL PURPOSE AI, data adalah POTENSIAL konteks)
     if chat_context == 'sapadapa_chat':
-        if raw_data_head:
-            prompt = f"""
-            Anda adalah AI Agent Aurinova. User telah mengunggah data. Berikut adalah beberapa baris pertama dari data yang diunggah oleh user:
-            ---
-            {raw_data_head}
-            ---
-            User sekarang ingin bertanya: "{user_message}"
-            Jawab pertanyaan user ini berdasarkan data yang disediakan di atas. Fokus pada memberikan wawasan atau informasi faktual dari data tersebut. Jika pertanyaan user bersifat umum dan tidak terkait langsung dengan data, jawablah secara umum dan fleksibel sebagai AI Agent Aurinova.
-            AI:
-            """
-        else:
-            prompt = f"""
-            Anda adalah AI Agent Aurinova. User belum mengunggah data untuk sesi ini. User bertanya: "{user_message}"
-            Jawab pertanyaan user ini secara umum dan fleksibel. Anda bisa menjelaskan tentang konsep analisis data, klasterisasi, atau kerangka SAPADAPA (Situation Analysis, Problem Analysis, Decision Analysis, Potential Problem Analysis) jika relevan, atau topik umum lainnya.
-            AI:
-            """
+        prompt = f"""
+        Anda adalah AI Agent Aurinova. User bertanya: "{user_message}"
+        
+        Tugas Anda adalah menjawab pertanyaan user ini secara **umum dan fleksibel** terlebih dahulu.
+        
+        Namun, jika user secara eksplisit menanyakan tentang **data yang telah mereka unggah**, dan Anda memiliki akses ke beberapa baris pertama data tersebut (jika relevan, di bawah), barulah Anda bisa menggunakan data tersebut untuk memberikan jawaban spesifik.
+
+        Jika Anda memiliki akses ke beberapa baris pertama data yang diunggah oleh user (ini adalah konteks data yang mungkin Anda miliki, TIDAK WAJIB digunakan kecuali diminta):
+        ---
+        {raw_data_head if raw_data_head else "Tidak ada data yang diunggah dalam sesi ini."}
+        ---
+
+        Fokus utama Anda adalah memberikan jawaban yang bermanfaat sebagai AI Agent Aurinova, yang meliputi konsep analisis data, klasterisasi, atau kerangka SAPADAPA (Situation Analysis, Problem Analysis, Decision Analysis, Potential Problem Analysis), atau topik umum lainnya.
+
+        AI:
+        """
     # Logika chat untuk halaman utama (index.html), tetap fokus pada hasil klasterisasi
     else: # context is 'general' or from '/app'
         if not clustering_summary:
@@ -429,6 +430,14 @@ def get_cached_data(session_id):
         })
     return jsonify({'error': 'Data not found in cache for this session.'}), 404
 
+@app.route('/reset_session', methods=['POST'])
+def reset_session():
+    data = request.json
+    session_id_to_reset = data.get('session_id')
+    if session_id_to_reset and session_id_to_reset in session_data_cache:
+        del session_data_cache[session_id_to_reset]
+        return jsonify({'status': 'success', 'message': f'Session {session_id_to_reset} data cleared.'})
+    return jsonify({'status': 'failed', 'message': 'Session not found or already cleared.'}), 404
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

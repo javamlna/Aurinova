@@ -411,6 +411,19 @@
             word-wrap: break-word;
             font-family: 'Poppins', sans-serif;
         }
+        .reset-chat-button {
+            background: none;
+            border: none;
+            color: #FF5722; /* Warna merah/oranye untuk indikasi reset/bahaya */
+            font-size: 1.8em;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 5px; /* Jarak dari tombol kirim */
+            transition: color 0.3s ease;
+        }
+        .reset-chat-button:hover {
+            color: #E64A19; /* Warna lebih gelap saat hover */
+        }
 
 
         @media (max-width: 768px) {
@@ -468,6 +481,8 @@
                 <i class="fas fa-plus"></i>
             </button>
             <button onclick="sendMessage()">Kirim</button>
+            <button class="reset-chat-button" onclick="resetChat()" aria-label="Reset Chat">
+                <i class="fas fa-redo"></i> </button>
         </div>
 
         <a href="{{ url_for('main_app') }}" class="back-button">Mulai Klasterisasi</a>
@@ -680,6 +695,34 @@
         async function sendMessageToAIForConfirmation(uploadResponseMessage) {
             // Append the confirmation message from the bot
             appendMessage('bot', `Baik, data Anda berhasil diunggah! Saya sudah memprosesnya. Sekarang Anda bisa bertanya tentang data ini (misal: "ada berapa baris?", "kolom apa saja yang ada?"), atau topik lainnya yang Anda inginkan.`);
+        }
+        async function resetChat() {
+            if (!confirm("Apakah Anda yakin ingin mereset riwayat chat dan data yang diunggah untuk sesi ini?")) {
+                return;
+            }
+
+            document.getElementById('chatBox').innerHTML = '';
+            
+            const oldSessionId = currentSessionId; 
+            currentSessionId = 'sapadapa_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('aurinovaSessionId', currentSessionId);
+            
+            try {
+                const response = await fetch('/reset_session', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: oldSessionId })
+                });
+                if (!response.ok) {
+                    console.error("Backend reset failed:", await response.text());
+                } else {
+                    console.log(`Backend session ${oldSessionId} reset.`);
+                }
+            } catch (error) {
+                console.error("Error communicating with backend for session reset:", error);
+            }
+
+            appendMessage('bot', 'Halo! Saya AI Agent Aurinova. Sesi chat telah direset. Anda bisa mengunggah file CSV melalui tombol plus di bawah untuk saya analisis, atau langsung ajukan pertanyaan umum tentang analisis data!');
         }
     </script>
 </body>

@@ -208,14 +208,11 @@ def chat():
 
     return jsonify({'reply': ai_reply})
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    session_id = request.form.get('session_id', str(uuid.uuid4()))
-    
-    unique_id = str(uuid.uuid4()) # Ini UID untuk plot/CSV hasil klasterisasi
-    img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
-    result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
-    original_csv_path = os.path.join(UPLOAD_FOLDER, f'original_data_{session_id}.csv') # Simpan file asli
+@app.route('/upload_for_sapadapa', methods=['POST'])
+def upload_for_sapadapa():
+    session_id = request.form.get('session_id')
+    if not session_id:
+        return jsonify({'error': 'Session ID is required'}), 400
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -223,190 +220,129 @@ def upload_file():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    # Simpan file yang diunggah ke lokasi aslinya
-    file.save(original_csv_path)
-
-    file_delimiter = request.form.get('delimiter', ',') # Delimiter akan tetap default atau dideteksi
-
     try:
+        # Simpan file asli untuk sesi ini
+        original_csv_path = os.path.join(UPLOAD_FOLDER, f'original_data_{session_id}.csv')
+        file.save(original_csv_path)
+
+        file_delimiter = request.form.get('delimiter', ',')
         df = pd.read_csv(original_csv_path, encoding='utf-8', sep=file_delimiter)
-    except UnicodeDecodeError:
-        try:
-            df = pd.read_csv(original_csv_path, encoding='latin1', sep=file_delimiter)
-        except Exception as e:
-            return jsonify({'error': f'Failed to read CSV file with common encodings: {str(e)}'}), 400
-    except Exception as e:
-        return jsonify({'error': f'Failed to read CSV file: {str(e)}'}), 400
-
-  
-    raw_data_head = df.head(5).to_string() 
-    
-
-    feature_cols = request.form.get('features')
-    if feature_cols:
-        feature_cols = [f.strip() for f in feature_cols.split(',')]
-        feature_cols = [f for f in feature_cols if f in df.columns]
-    else:
-        feature_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-        if not feature_cols: 
-            all_cols = df.columns.tolist()
-            if len(all_cols) > 0:
-                feature_cols = all_cols
-            else:
-                return jsonify({'error': 'Tidak ada kolom yang terdeteksi di file CSV.'}), 400
-
-
-    # Jika setelah deteksi otomatis masih kurang dari 2 fitur (untuk PCA)
-    if len(feature_cols) < 2 and len(df) > 1: # Minimal 2 fitur untuk PCA dan klasterisasi
-         # Try to pick 2 columns if possible
-         if len(df.columns) >= 2:
-             feature_cols = df.columns[:2].tolist() # Just pick first two columns
-         else:
-             # Handle case with only one column or empty df for clustering, though AI can still read it
-             pass # Will proceed with less than 2 features for AI, but clustering might fail
-
-
-    # --- Bagian Klasterisasi (Tetap Berjalan di Backend untuk cache Index.html) ---
-    df_encoded = encode_categorical(df.copy(), feature_cols) # Gunakan copy untuk menghindari SettingWithCopyWarning
-    df_encoded = clean_and_fill_mean(df_encoded)
-    
-    # Handle case where df_encoded might become empty or have no columns after encoding
-    if df_encoded.empty or df_encoded.shape[1] == 0:
-        # If encoding resulted in an empty dataframe (e.g., all invalid columns),
-        # then we cannot perform clustering, but AI can still read raw_data_head.
-        # Store basic info to cache, but indicate clustering not performed.
+        
+        # Simpan hanya informasi yang dibutuhkan Sapadapa ke cache
         session_data_cache[session_id] = {
-            "raw_data_head": raw_data_head,
-            "original_csv_url": f'/download/original_csv/{session_id}', # New: link to original CSV
-            "summary": "Tidak dapat melakukan klasterisasi dengan fitur yang tersedia. Silakan coba di aplikasi utama.",
-            "features": [], # No features used for clustering
-            "algorithm": "N/A",
-            "n_clusters": 0,
-            "last_plot_uid": None # No plot generated
+            "raw_data_head": df.head(5).to_string(),
+            "original_csv_url": f'/download/original_csv/{session_id}',
+            "summary": "Data telah diunggah. Silakan ajukan pertanyaan.",
+            "chat_history": [] # Reset riwayat chat saat data baru diunggah
         }
+        
         return jsonify({
             'success': True,
             'message': 'Data berhasil diunggah. AI siap menjawab pertanyaan umum tentang data Anda.',
-            'raw_data_head': raw_data_head,
-            'session_id': session_id,
-            'original_csv_url': f'/download/original_csv/{session_id}'
+            'raw_data_head': df.head(5).to_string(),
+            'session_id': session_id
         })
 
-    df_scaled = normalize(df_encoded, df_encoded.columns)
+    except Exception as e:
+        return jsonify({'error': f'Gagal memproses file: {str(e)}'}), 500
+    
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    session_id = request.form.get('session_id')
+    if not session_id:
+        return jsonify({'error': 'Session ID is required'}), 400
 
-    if df_scaled.isnull().values.any():
-        # Handle NaN after normalization - means some columns were problematic
-        session_data_cache[session_id] = {
-            "raw_data_head": raw_data_head,
-            "original_csv_url": f'/download/original_csv/{session_id}',
-            "summary": "Terdapat nilai yang hilang atau tidak valid setelah normalisasi. Klasterisasi tidak dapat dilakukan.",
-            "features": feature_cols,
-            "algorithm": "N/A",
-            "n_clusters": 0,
-            "last_plot_uid": None
-        }
-        return jsonify({
-            'success': True,
-            'message': 'Data berhasil diunggah, namun ada masalah normalisasi. AI siap menjawab pertanyaan umum.',
-            'raw_data_head': raw_data_head,
-            'session_id': session_id,
-            'original_csv_url': f'/download/original_csv/{session_id}'
-        })
-    
-    # Default parameters for backend clustering (since sapadapa.html doesn't provide them)
-    algo = 'kmeans'
-    n_clusters_auto = elbow_method(df_scaled)
-    clusters = []
-    
-    # Only perform clustering if there are enough samples and features for meaningful clustering
-    if len(df_scaled) >= 2 and df_scaled.shape[1] >= 2: # At least 2 samples and 2 features for PCA/KMeans
-        try:
-            model = KMeans(n_clusters=n_clusters_auto, random_state=42, n_init=10)
-            clusters = model.fit_predict(df_scaled)
-            df['cluster'] = clusters
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    try:
+        # Setup path unik untuk hasil analisis
+        unique_id = str(uuid.uuid4())
+        img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
+        result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
+        
+        file_delimiter = request.form.get('delimiter', ',')
+        df = pd.read_csv(file, encoding='utf-8', sep=file_delimiter)
+
+        feature_cols = request.form.get('features').split(',')
+        feature_cols = [f.strip() for f in feature_cols if f.strip() in df.columns]
+
+        if not feature_cols:
+            raise ValueError("Tidak ada fitur valid yang dipilih.")
+
+        # PROSES DATA
+        df_cleaned = clean_and_fill_mean(df.copy())
+        df_encoded = encode_categorical(df_cleaned, feature_cols)
+        
+        if df_encoded.empty or df_encoded.shape[1] == 0:
+            raise ValueError("Tidak ada data valid setelah encoding.")
             
-            # Generate plot if clustering was successful
-            pca = PCA(n_components=2)
-            pca_result = pca.fit_transform(df_scaled)
+        df_scaled = normalize(df_encoded, df_encoded.columns)
 
+        # PROSES KLASTERISASI
+        algo = request.form.get('algorithm', 'kmeans')
+        n_clusters_req = request.form.get('n_clusters')
+        clusters = []
+
+        if algo == 'kmeans':
+            if n_clusters_req and n_clusters_req.isdigit() and int(n_clusters_req) > 0:
+                n_clusters = int(n_clusters_req)
+            else:
+                n_clusters = elbow_method(df_scaled)
+            model = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+            clusters = model.fit_predict(df_scaled)
+        elif algo == 'dbscan':
+            model = DBSCAN(eps=0.5, min_samples=5)
+            clusters = model.fit_predict(df_scaled)
+        
+        df['cluster'] = clusters
+        df.to_csv(result_csv_path, index=False)
+
+        # BUAT PLOT (DENGAN PENJAGA)
+        plot_url = "" # Defaultnya kosong
+        numeric_features_for_plot = df_scaled.select_dtypes(include=np.number).columns
+        if len(numeric_features_for_plot) >= 2:
+            pca = PCA(n_components=2)
+            pca_result = pca.fit_transform(df_scaled[numeric_features_for_plot])
+            
             plt.figure(figsize=(10, 7))
             unique_clusters = np.unique(clusters)
-            num_clusters_to_color = len(unique_clusters)
-            cmap = cm.get_cmap('tab10', num_clusters_to_color)
-
+            cmap = cm.get_cmap('tab10', len(unique_clusters))
+            
             for i, cluster_label in enumerate(unique_clusters):
-                cluster_points = pca_result[clusters == cluster_label]
-                legend_label = f'Cluster {cluster_label}'
-                if cluster_label == -1:
-                    legend_label = 'Noise (-1)'
-                plt.scatter(
-                    cluster_points[:, 0],
-                    cluster_points[:, 1],
-                    color=cmap(i),
-                    label=legend_label,
-                    s=50,
-                    alpha=0.8
-                )
+                points = pca_result[clusters == cluster_label]
+                plt.scatter(points[:, 0], points[:, 1], color=cmap(i), label=f'Cluster {cluster_label}')
 
-            plt.xlabel('PCA 1')
-            plt.ylabel('PCA 2')
-            plt.title(f'Clustering Result ({algo}, k={len(set(clusters))})')
-            plt.legend(loc='lower center', bbox_to_anchor=(0.5, -0.25), ncol=max(1, min(len(unique_clusters), 4)), fancybox=True, shadow=True)
-            plt.subplots_adjust(bottom=0.25, right=0.95)
+            plt.xlabel('Principal Component 1')
+            plt.ylabel('Principal Component 2')
+            plt.title(f'Hasil Klasterisasi ({algo.upper()})')
+            plt.legend()
             plt.grid(True)
             plt.savefig(img_path)
             plt.close()
+            plot_url = f'/download/plot/{unique_id}'
 
-            df.to_csv(result_csv_path, index=False)
-            
-            # Store full clustering results
-            session_data_cache[session_id] = {
-                "raw_data_head": raw_data_head,
-                "original_csv_url": f'/download/original_csv/{session_id}',
-                "summary": generate_summary(df, feature_cols, algo, len(set(clusters))),
-                "features": feature_cols,
-                "algorithm": algo,
-                "n_clusters": len(set(clusters)),
-                "last_plot_uid": unique_id,
-                "clustered_csv_url": f'/download/csv/{unique_id}', # Link to clustered CSV
-                "plot_url": f'/download/plot/{unique_id}' # Link to plot
-            }
-            message_for_sapadapa = 'Data Anda berhasil diunggah. AI siap menjawab pertanyaan tentang data Anda dan hasil klasterisasi telah disiapkan untuk aplikasi utama!'
-            
-        except Exception as e:
-            # If clustering fails for any reason, store only raw data info
-            session_data_cache[session_id] = {
-                "raw_data_head": raw_data_head,
-                "original_csv_url": f'/download/original_csv/{session_id}',
-                "summary": f"Klasterisasi gagal: {str(e)}. Silakan coba di aplikasi utama jika Anda ingin mengklaster data.",
-                "features": feature_cols,
-                "algorithm": "N/A",
-                "n_clusters": 0,
-                "last_plot_uid": None
-            }
-            message_for_sapadapa = f'Data Anda berhasil diunggah, namun klasterisasi gagal. AI siap menjawab pertanyaan tentang data Anda.'
-    else:
-        # If not enough features/samples for meaningful clustering
+        # SIMPAN HASIL KE CACHE
+        summary = generate_summary(df, feature_cols, algo, len(np.unique(clusters)))
         session_data_cache[session_id] = {
-            "raw_data_head": raw_data_head,
-            "original_csv_url": f'/download/original_csv/{session_id}',
-            "summary": "Data terlalu kecil atau tidak memiliki cukup fitur numerik untuk klasterisasi.",
-            "features": feature_cols,
-            "algorithm": "N/A",
-            "n_clusters": 0,
-            "last_plot_uid": None
+            "summary": summary,
+            "chat_history": []
         }
-        message_for_sapadapa = 'Data Anda berhasil diunggah, namun tidak ada cukup fitur untuk klasterisasi. AI siap menjawab pertanyaan tentang data Anda.'
+        
+        # KIRIM RESPON JSON YANG KONSISTEN
+        return jsonify({
+            'clusters': {str(k): int(v) for k, v in df['cluster'].value_counts().items()},
+            'features': feature_cols,
+            'plot_url': plot_url,
+            'csv_url': f'/download/csv/{unique_id}'
+        })
 
-    # Return only what sapadapa.html needs
-    return jsonify({
-        'success': True,
-        'message': message_for_sapadapa,
-        'raw_data_head': raw_data_head,
-        'session_id': session_id,
-        'original_csv_url': f'/download/original_csv/{session_id}' # Provide original CSV download
-    })
-
+    except Exception as e:
+        # Jika terjadi error di mana pun, kirim respons error yang jelas
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/download/plot/<uid>')
 def download_plot(uid):

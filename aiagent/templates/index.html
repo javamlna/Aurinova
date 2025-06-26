@@ -209,6 +209,15 @@
   color: #000;
   border-bottom-left-radius: 4px;
   text-align: left;
+  p, ul, ol, li {
+        margin: 0; /* Hapus margin default */
+        padding: 0; /* Hapus padding default */
+        text-indent: 0; /* Pastikan tidak ada indentasi tambahan */
+    }
+    /* Untuk daftar, atur ulang bullet/numbering jika perlu */
+    ul, ol {
+        padding-left: 20px; /* Tambahkan sedikit padding jika ingin numbering/bullet terlihat */
+    }
 }
 
 .message strong {

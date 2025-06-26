@@ -65,14 +65,30 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
+        
+        buttonung {
+            background-color: #00BFA6;
+            width: 100%;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            border: none;
+        }
+         buttonung:hover {
+            background-color: #009e8f;
+        }
 
         button {
             background-color: #00BFA6;
+            width: 10%;
             color: white;
             cursor: pointer;
             transition: background-color 0.3s ease;
             border: none;
         }
+        
         button:hover {
             background-color: #009e8f;
         }
@@ -141,10 +157,6 @@
             margin-bottom: 10px;
         }
 
-
-        /* ============================================== */
-        /* === SOLUSI DEFINITIF UNTUK CHATBOT STYLING === */
-        /* ============================================== */
         .chat-section {
             padding-bottom: 0;
         }
@@ -270,20 +282,19 @@
                 <label for="featureCheckboxes">4. Pilih Fitur</label>
                 <div id="featureCheckboxes">Pilih file untuk melihat fitur...</div>
 
-                <button onclick="upload()">Unggah & Analisis</button>
+                <buttonung onclick="upload()">Unggah & Analisis</buttonung>
             </div>
         </div>
         <div class="panel overview-section">
             <h2>Gambaran Umum Data</h2>
             <div class="panel-content" id="overviewTables">
-                <p>Hasil analisis akan muncul di sini.</p>
             </div>
             <a id="downloadCsv" class="download-button" href="#" download>Unduh File Hasil</a>
         </div>
         <div class="panel visual-section">
             <h2>Hasil Klasterisasi</h2>
             <div class="panel-content" id="visualContent">
-                <p>Visualisasi plot akan muncul di sini.</p>
+            
                 <img id="clusterPlot" alt="Hasil plot klasterisasi"/>
                 <p id="plotErrorMsg" style="color: red;"></p>
             </div>

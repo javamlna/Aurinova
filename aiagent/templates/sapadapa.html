@@ -6,7 +6,7 @@
     <title>Aurinova - SAPADAPA</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="{{ url_for('static', filename='images/logobrr.png') }}" type="image/png" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         body {
@@ -111,7 +111,6 @@
             line-height: 1.5;
         }
 
-        /* Chatbox styling */
         #chatBox {
             display: flex;
             flex-direction: column;
@@ -129,17 +128,21 @@
             margin-bottom: 20px;
         }
 
+        /* ============================================== */
+        /* === SOLUSI DEFINITIF UNTUK CHATBOT STYLING === */
+        /* ============================================== */
+
+        /* 1. Aturan dasar untuk SEMUA bubble chat */
         .message {
             max-width: 75%;
             padding: 10px 15px;
             border-radius: 18px;
-            line-height: 1.6; /* Sedikit ditambah untuk keterbacaan */
             white-space: pre-wrap;
             word-wrap: break-word;
             box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-    }
+        }
 
-    /* Aturan untuk bubble PENGGUNA (USER) */
+        /* 2. Aturan untuk bubble PENGGUNA (USER) */
         .message.user {
             align-self: flex-end;
             background-color: #DCF8C6;
@@ -147,6 +150,7 @@
             border-bottom-right-radius: 4px;
         }
 
+        /* 3. Aturan untuk bubble BOT - menjadi Flex Container */
         .message.bot {
             align-self: flex-start;
             background-color: #F1F0F0;
@@ -155,51 +159,44 @@
             text-align: left;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px; /* Jarak KONSISTEN antar elemen */
         }
 
-        .message.bot > * {
+        /*
+        * 4. PERBAIKAN UNTUK LOADING INDICATOR
+        * Aturan ini lebih spesifik, sehingga akan menimpa aturan .message.bot di atas
+        * HANYA untuk bubble loading.
+        */
+        .message.bot.loading-indicator {
+            flex-direction: row; /* Paksa kembali menjadi horizontal */
+            align-items: center; /* Pusatkan titik-titik secara vertikal */
+            gap: 4px; /* Jarak antar titik */
+        }
+
+        /*
+        * 5. PERBAIKAN UNTUK GAP (Reset Agresif)
+        * Menargetkan semua elemen ('*') di dalam bubble bot dan hapus margin/padding bawaan mereka.
+        */
+        .message.bot * {
             margin: 0;
             padding: 0;
+            line-height: 1.5; /* Tinggi baris yang konsisten untuk semua teks */
         }
 
-        .message.bot li {
-            line-height: 1.4;
-            margin-bottom: 4px; /* Sedikit jarak antar item list jika perlu */
-        }
-
+        /*
+        * 6. Aturan Spesifik SETELAH Reset
+        * Tambahkan kembali padding yang diperlukan agar list terlihat benar.
+        */
         .message.bot ul,
         .message.bot ol {
             padding-left: 20px; /* Ruang untuk bullet/nomor */
         }
 
-        .message strong {
-            display: block;
-            margin-bottom: 0px;
-            color: #333;
-            font-weight: 600;
+        .message.bot li {
+            margin-bottom: 5px; /* Jarak kecil antar item list */
         }
-
-        .message pre, .message code {
-            white-space: pre-wrap;
-            word-break: break-word;
-            overflow-x: auto;
-        }
-
-        .loading-indicator {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            padding: 10px 15px;
-            border-radius: 18px;
-            background-color: #F1F0F0;
-            color: #000;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            max-width: 75%;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-        }
-
+        
+        /* Loading indicator styling (titik-titik) */
         .loading-indicator span {
             display: inline-block;
             width: 6px;
@@ -218,6 +215,7 @@
             0%, 75%, 100% { opacity: 0; }
             25%, 50% { opacity: 1; }
         }
+
 
         .chat-controls {
             display: flex;
@@ -315,19 +313,18 @@
             background-color: white;
         }
 
-        /* New styles for upload modal */
         .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
+            display: none; 
+            position: fixed; 
+            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            justify-content: center; /* Untuk centering */
-            align-items: center; /* Untuk centering */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
         }
 
         .modal-content {
@@ -391,8 +388,7 @@
         .modal-content button:hover {
             background-color: #009e8f;
         }
-
-      
+        
         .upload-plus-button {
             background: none;
             border: none;
@@ -406,8 +402,7 @@
         .upload-plus-button:hover {
             color: #009e8f;
         }
-
-       
+        
         .upload-summary { 
             background-color: #e0f2f1;
             border-left: 5px solid #00BFA6;
@@ -433,19 +428,21 @@
         .reset-chat-button {
             background: none;
             border: none;
-            color: #FF5722; /* Warna merah/oranye untuk indikasi reset/bahaya */
+            color: #FF5722;
             font-size: 1.8em;
             cursor: pointer;
             padding: 0;
-            margin-left: 5px; /* Jarak dari tombol kirim */
+            margin-left: 5px;
             transition: color 0.3s ease;
         }
         .reset-chat-button:hover {
-            color: #E64A19; /* Warna lebih gelap saat hover */
+            color: #E64A19;
         }
 
-
         @media (max-width: 768px) {
+            .sapadapa-steps {
+                grid-template-columns: 1fr;
+            }
             .modal-content {
                 padding: 20px;
                 width: 95%;
@@ -552,7 +549,6 @@
                 if (response.ok) {
                     const data = await response.json();
                     
-                    // Memuat ulang riwayat chat jika ada
                     if (data.chat_history && data.chat_history.length > 0) {
                         data.chat_history.forEach(turn => {
                             appendMessage('user', turn.user);
@@ -561,9 +557,8 @@
                     }
 
                     if (data.raw_data_head) {
-                        // Hanya tampilkan pesan ini jika belum ada chat sebelumnya atau sebagai tambahan
                          if (!data.chat_history || data.chat_history.length === 0) {
-                            appendMessage('bot', 'Saya mendeteksi data yang telah Anda unggah sebelumnya. Sekarang Anda bisa bertanya tentang data ini (misal: "jelaskan kolom X", "ada berapa baris?"), atau pertanyaan umum lainnya!');
+                            appendMessage('bot', 'Saya mendeteksi data yang telah Anda unggah sebelumnya. Sekarang Anda bisa bertanya tentang data ini.');
                          }
                     }
                 }
@@ -580,9 +575,11 @@
             if (sender === 'user') {
                 messageDiv.classList.add('user');
                 messageDiv.textContent = message;
-            } else {
+            } else { // Handles 'bot' and 'agent'
                 messageDiv.classList.add('bot');
-                messageDiv.innerHTML = marked.parse(message).replace(/<p>|<\/p>/g, '');
+                // Use .trim() to remove potential leading/trailing newlines from AI response
+                const cleanedMessage = message.trim();
+                messageDiv.innerHTML = marked.parse(cleanedMessage);
             }
 
             chatBox.appendChild(messageDiv);
@@ -593,6 +590,9 @@
 
         function showLoadingIndicator() {
             const chatBox = document.getElementById('chatBox');
+            // Check if a loading indicator already exists
+            if (document.querySelector('.loading-indicator')) return;
+            
             loadingMessageDiv = document.createElement('div');
             loadingMessageDiv.classList.add('message', 'bot', 'loading-indicator');
             loadingMessageDiv.innerHTML = `
@@ -605,10 +605,11 @@
         }
 
         function removeLoadingIndicator() {
-            if (loadingMessageDiv && loadingMessageDiv.parentNode) {
-                loadingMessageDiv.parentNode.removeChild(loadingMessageDiv);
-                loadingMessageDiv = null;
+            const existingIndicator = document.querySelector('.loading-indicator');
+            if (existingIndicator) {
+                existingIndicator.parentNode.removeChild(existingIndicator);
             }
+            loadingMessageDiv = null;
         }
 
         async function sendMessage() {
@@ -628,17 +629,18 @@
                     body: JSON.stringify({ message: text, context: 'sapadapa_chat', session_id: currentSessionId })
                 });
 
+                removeLoadingIndicator();
+
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error('Gagal terhubung ke AI Agent: ' + errorText);
                 }
 
                 const data = await response.json();
-                removeLoadingIndicator();
-                appendMessage('agent', data.reply);
+                appendMessage('bot', data.reply);
             } catch (error) {
                 removeLoadingIndicator();
-                appendMessage('agent', 'Error: ' + error.message);
+                appendMessage('bot', 'Error: ' + error.message);
             }
         }
 
@@ -649,7 +651,6 @@
             }
         });
 
-        // --- Modal Upload Functions ---
         function openUploadModal() {
             document.getElementById('uploadModal').style.display = 'flex';
             document.getElementById('uploadStatus').textContent = '';
@@ -660,19 +661,14 @@
             document.getElementById('uploadModal').style.display = 'none';
         }
 
-        // loadModalCSVHeaders is now just for delimiter detection
         function loadModalCSVHeaders() {
             const input = document.getElementById('modalFileInput');
             if (input.files.length === 0) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const lines = e.target.result.split('\n');
-                const firstLine = lines[0];
-                
-                if (firstLine.includes(',')) {
-                    detectedDelimiter = ',';
-                } else if (firstLine.includes(';')) {
+                const firstLine = e.target.result.split('\n')[0];
+                if (firstLine.includes(';')) {
                     detectedDelimiter = ';';
                 } else if (firstLine.includes('\t')) {
                     detectedDelimiter = '\t';
@@ -706,14 +702,14 @@
                 });
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error('Upload gagal: ' + errorText);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Upload gagal');
                 }
 
                 const data = await response.json();
                 
                 closeUploadModal();
-                sendMessageToAIForConfirmation(data.message); 
+                appendMessage('bot', data.message || 'Data Anda berhasil diunggah! Sekarang Anda bisa bertanya tentang data ini.');
 
             } catch (error) {
                 uploadStatus.textContent = 'Error: ' + error.message;
@@ -721,13 +717,10 @@
             }
         }
 
-        // Function to send an internal message to AI after successful upload
-        async function sendMessageToAIForConfirmation(uploadResponseMessage) {
-            // Append the confirmation message from the bot
-            appendMessage('bot', `Baik, data Anda berhasil diunggah! Saya sudah memprosesnya. Sekarang Anda bisa bertanya tentang data ini (misal: "ada berapa baris?", "kolom apa saja yang ada?"), atau topik lainnya yang Anda inginkan.`);
-        }
         async function resetChat() {
-            if (!confirm("Apakah Anda yakin ingin mereset riwayat chat dan data yang diunggah untuk sesi ini?")) {
+            // Use a custom modal for confirmation instead of window.confirm
+            const userIsSure = await showCustomConfirm("Apakah Anda yakin ingin mereset riwayat chat dan data yang diunggah untuk sesi ini?");
+            if (!userIsSure) {
                 return;
             }
 
@@ -738,21 +731,67 @@
             localStorage.setItem('aurinovaSessionId', currentSessionId);
             
             try {
-                const response = await fetch('/reset_session', { 
+                await fetch('/reset_session', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ session_id: oldSessionId })
                 });
-                if (!response.ok) {
-                    console.error("Backend reset failed:", await response.text());
-                } else {
-                    console.log(`Backend session ${oldSessionId} reset.`);
-                }
             } catch (error) {
                 console.error("Error communicating with backend for session reset:", error);
             }
 
             appendMessage('bot', 'Halo! Saya Nova, asisten AI dari Aurinova. Sesi chat telah direset!');
+        }
+
+        // Custom confirm dialog function
+        function showCustomConfirm(message) {
+            return new Promise(resolve => {
+                const confirmBox = document.createElement('div');
+                confirmBox.style.cssText = `
+                    position: fixed;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background-color: rgba(0,0,0,0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 2000;
+                `;
+
+                const contentBox = document.createElement('div');
+                contentBox.style.cssText = `
+                    background: white;
+                    padding: 25px;
+                    border-radius: 10px;
+                    text-align: center;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                `;
+
+                const messageP = document.createElement('p');
+                messageP.textContent = message;
+                messageP.style.marginBottom = '20px';
+
+                const btnYes = document.createElement('button');
+                btnYes.textContent = 'Ya, Reset';
+                btnYes.style.marginRight = '10px';
+                btnYes.onclick = () => {
+                    document.body.removeChild(confirmBox);
+                    resolve(true);
+                };
+
+                const btnNo = document.createElement('button');
+                btnNo.textContent = 'Batal';
+                btnNo.style.backgroundColor = '#6c757d';
+                btnNo.onclick = () => {
+                    document.body.removeChild(confirmBox);
+                    resolve(false);
+                };
+                
+                contentBox.appendChild(messageP);
+                contentBox.appendChild(btnYes);
+                contentBox.appendChild(btnNo);
+                confirmBox.appendChild(contentBox);
+                document.body.appendChild(confirmBox);
+            });
         }
     </script>
 </body>

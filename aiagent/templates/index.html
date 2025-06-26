@@ -208,6 +208,7 @@
   background-color: #F1F0F0;
   color: #000;
   border-bottom-left-radius: 4px;
+  text-align: left;
 }
 
 .message strong {
@@ -407,7 +408,7 @@
     messageDiv.textContent = message;  
   } else {
     messageDiv.classList.add('bot');
-    messageDiv.innerHTML = `<strong>AI Agent:</strong> ${marked.parse(message).replace(/<p>|<\/p>/g, '')}`;
+    messageDiv.innerHTML = marked.parse(message).replace(/<p>|<\/p>/g, '');
   }
 
   chatBox.appendChild(messageDiv);

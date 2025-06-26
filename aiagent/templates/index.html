@@ -333,6 +333,12 @@
 </div>
   </div>
   <script>
+    let currentSessionId = localStorage.getItem('aurinovaSessionId');
+        if (!currentSessionId) {
+            // Buat ID sesi baru jika tidak ada
+            currentSessionId = 'main_app_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('aurinovaSessionId', currentSessionId);
+        }
     let detectedDelimiter = ','; 
 
     function loadCSVHeaders() {
@@ -457,25 +463,31 @@ async function sendMessage() {
         showLoadingIndicator(); // Tampilkan loading indicator
 
         try {
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
-            });
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // --- MODIFIKASI BAGIAN BODY DI BAWAH INI ---
+                    body: JSON.stringify({ 
+                        message: text,
+                        session_id: currentSessionId, // Kirim session_id
+                        context: 'clustering_result' // Konteks spesifik untuk halaman ini
+                    })
+                    // ---------------------------------------------
+                });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error('Gagal terhubung ke AI Agent: ' + errorText); // Tambahkan errorText untuk debugging
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error('Gagal terhubung ke AI Agent: ' + errorText);
+                }
+
+                const data = await response.json();
+                removeLoadingIndicator(); 
+                appendMessage('agent', data.reply);
+            } catch (error) {
+                removeLoadingIndicator(); 
+                appendMessage('agent', 'Error: ' + error.message);
             }
-
-            const data = await response.json();
-            removeLoadingIndicator(); // Hapus loading indicator sebelum menampilkan respons
-            appendMessage('agent', data.reply);
-        } catch (error) {
-            removeLoadingIndicator(); // Hapus loading indicator meskipun ada error
-            appendMessage('agent', 'Error: ' + error.message);
         }
-    }
 
     async function upload() {
       const input = document.getElementById('fileInput');
@@ -488,6 +500,7 @@ async function sendMessage() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('delimiter', detectedDelimiter); 
+      formData.append('session_id', currentSessionId);
       const algorithm = document.getElementById('algorithm').value;
       formData.append('algorithm', algorithm);
       const nClusters = document.getElementById('nClusters').value;

@@ -540,9 +540,20 @@
                 const response = await fetch(`/get_cached_data/${currentSessionId}`);
                 if (response.ok) {
                     const data = await response.json();
-                    if (data.raw_data_head) { // If raw data head is available from cache
-                        // NO LONGER DISPLAYING RAW DATA HEAD OR DOWNLOAD LINK
-                        appendMessage('bot', 'Saya mendeteksi data yang telah Anda unggah sebelumnya. Sekarang Anda bisa bertanya tentang data ini (misal: "jelaskan kolom X", "ada berapa baris?"), atau pertanyaan umum lainnya!');
+                    
+                    // Memuat ulang riwayat chat jika ada
+                    if (data.chat_history && data.chat_history.length > 0) {
+                        data.chat_history.forEach(turn => {
+                            appendMessage('user', turn.user);
+                            appendMessage('bot', turn.bot);
+                        });
+                    }
+
+                    if (data.raw_data_head) {
+                        // Hanya tampilkan pesan ini jika belum ada chat sebelumnya atau sebagai tambahan
+                         if (!data.chat_history || data.chat_history.length === 0) {
+                            appendMessage('bot', 'Saya mendeteksi data yang telah Anda unggah sebelumnya. Sekarang Anda bisa bertanya tentang data ini (misal: "jelaskan kolom X", "ada berapa baris?"), atau pertanyaan umum lainnya!');
+                         }
                     }
                 }
             } catch (error) {

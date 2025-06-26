@@ -145,55 +145,67 @@ def main_app():
 def chat():
     data = request.json
     user_message = data.get('message', '')
-    chat_context = data.get('context', 'general')
-    session_id = data.get('session_id', 'default_session')
+    chat_context = data.get('context', 'general') # Akan menjadi 'clustering_result' dari index.html
+    session_id = data.get('session_id') # Sekarang kita mengharapkan session_id
+
+    if not session_id:
+        return jsonify({'reply': "Error: ID Sesi tidak ditemukan. Mohon refresh halaman."}), 400
 
     if not user_message:
         return jsonify({'reply': "Tolong masukkan pertanyaan."})
 
+    # Dapatkan data sesi saat ini, atau buat entri baru jika tidak ada
     current_session_data = session_data_cache.get(session_id, {})
+    
+    # Ambil konteks yang relevan dari cache
     raw_data_head = current_session_data.get("raw_data_head", "")
     clustering_summary = current_session_data.get("summary", "")
+    chat_history = current_session_data.get("chat_history", [])
 
-    # Logika chat untuk halaman SAPADAPA (GENERAL PURPOSE AI, data adalah POTENSIAL konteks)
+    # Format riwayat obrolan untuk prompt
+    formatted_history = "\n".join([f"User: {turn['user']}\nAI: {turn['bot']}" for turn in chat_history])
+
+    prompt = "" # Inisialisasi prompt
+    
+    # Logika untuk konteks halaman SAPADAPA
     if chat_context == 'sapadapa_chat':
         prompt = f"""
-        Anda adalah AI Agent Aurinova. User bertanya: "{user_message}"
+        Anda adalah AI Agent Aurinova.
+        Riwayat percakapan:
+        {formatted_history if formatted_history else "Tidak ada."}
         
-        Tugas Anda adalah menjawab pertanyaan user ini secara **umum dan fleksibel** terlebih dahulu.
-        
-        Namun, jika user secara eksplisit menanyakan tentang **data yang telah mereka unggah**, dan Anda memiliki akses ke beberapa baris pertama data tersebut (jika relevan, di bawah), barulah Anda bisa menggunakan data tersebut untuk memberikan jawaban spesifik.
+        Konteks data (jika ada):
+        {raw_data_head if raw_data_head else "Tidak ada data."}
 
-        Jika Anda memiliki akses ke beberapa baris pertama data yang diunggah oleh user (ini adalah konteks data yang mungkin Anda miliki, TIDAK WAJIB digunakan kecuali diminta):
-        ---
-        {raw_data_head if raw_data_head else "Tidak ada data yang diunggah dalam sesi ini."}
-        ---
-
-        Fokus utama Anda adalah memberikan jawaban yang bermanfaat sebagai AI Agent Aurinova, yang meliputi konsep analisis data, klasterisasi, atau kerangka SAPADAPA (Situation Analysis, Problem Analysis, Decision Analysis, Potential Problem Analysis), atau topik umum lainnya.
-
+        User bertanya: "{user_message}"
         AI:
         """
-    # Logika chat untuk halaman utama (index.html), tetap fokus pada hasil klasterisasi
-    else: # context is 'general' or from '/app'
+    # Logika untuk konteks halaman utama (index.html)
+    else: # Default ke konteks hasil klasterisasi
         if not clustering_summary:
-            prompt = f"""
-            User belum mengunggah atau mengelompokkan data di aplikasi utama. Jawab pertanyaan user ({user_message})
-            dengan menjelaskan bahwa chatbot ini akan sangat berguna setelah data diunggah dan dianalisis di halaman utama.
-            Dorong user untuk mengunggah file CSV dan memilih fitur untuk memulai di halaman utama.
-            AI:
-            """
+            prompt = f"User bertanya '{user_message}', tapi belum ada hasil klasterisasi. Beri tahu user untuk mengunggah file dan menjalankan analisis terlebih dahulu."
         else:
             prompt = f"""
-            Berikut adalah ringkasan hasil clustering yang telah dilakukan:
-
+            Anda adalah AI yang menganalisis hasil klasterisasi.
+            Berikut ringkasan hasil klasterisasi:
             {clustering_summary}
 
-            Sekarang user ingin bertanya:
+            Riwayat percakapan sebelumnya:
+            {formatted_history if formatted_history else "Tidak ada."}
 
-            User: {user_message}
-            AI: Jawab berdasarkan hasil clustering di atas secara ringkas dan jelas. Jika pertanyaan terkait Situation, Problem, Decision, atau Potential Problem Analysis, kaitkan dengan ringkasan clustering yang diberikan.
+            User bertanya: "{user_message}"
+            AI: Jawab berdasarkan ringkasan dan riwayat di atas.
             """
+            
     ai_reply = query_openrouter(prompt)
+
+    # Simpan pertanyaan dan jawaban baru ke dalam riwayat
+    chat_history.append({"user": user_message, "bot": ai_reply})
+    current_session_data["chat_history"] = chat_history
+    
+    # Simpan kembali data sesi yang sudah diperbarui ke cache
+    session_data_cache[session_id] = current_session_data
+
     return jsonify({'reply': ai_reply})
 
 @app.route('/upload', methods=['POST'])
@@ -424,9 +436,10 @@ def get_cached_data(session_id):
     if cached_data:
         return jsonify({
             'raw_data_head': cached_data.get('raw_data_head', ''),
-            'summary': cached_data.get('summary', ''), # Still return summary for index.html context
+            'summary': cached_data.get('summary', ''),
             'last_plot_uid': cached_data.get('last_plot_uid'),
-            'original_csv_url': cached_data.get('original_csv_url') # Return original CSV URL
+            'original_csv_url': cached_data.get('original_csv_url'),
+            'chat_history': cached_data.get('chat_history', []) # <-- TAMBAHKAN INI
         })
     return jsonify({'error': 'Data not found in cache for this session.'}), 404
 

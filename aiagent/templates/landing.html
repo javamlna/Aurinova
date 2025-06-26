@@ -120,7 +120,8 @@
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
             display: inline-block;
             box-shadow: 0 8px 15px rgba(0, 191, 166, 0.3);
-            margin-top: 10px;
+            margin-top: 40px;
+            margin-bottom: 20px; /* Tambahkan margin bawah */
         }
         .start-button:hover {
             background-color: #009e8f;
@@ -138,47 +139,47 @@
             box-sizing: border-box;
             position: relative;
             z-index: 0;
-            display: flex; /* Menggunakan flexbox untuk penataan konten */
-            justify-content: center; /* Memusatkan konten footer secara horizontal */
+            display: flex;
+            justify-content: center;
         }
 
         .footer-content {
             display: flex;
-            justify-content: space-between; /* Untuk menyebar copyright dan ikon sosial */
+            justify-content: space-between;
             align-items: center;
             width: 100%;
-            max-width: 1700px; /* Sesuaikan dengan max-width layout utama Anda */
-            padding: 0 20px; /* Tambahkan padding di sisi */
+            max-width: 1700px;
+            padding: 0 20px;
         }
 
         .footer p {
             margin: 0;
             line-height: 1.5;
-            text-align: left; /* Sesuaikan perataan teks copyright */
+            text-align: left;
         }
 
         .social-icons {
             display: flex;
-            gap: 10px; /* Jarak antara ikon */
+            gap: 10px;
         }
 
         .social-icon {
             font-size: 1.5em;
             color: white;
             transition: color 0.3s ease, background-color 0.3s ease;
-            border: 1px solid white; /* Border putih */
-            border-radius: 50%; /* Membuat lingkaran */
-            width: 35px; /* Lebar lingkaran */
-            height: 35px; /* Tinggi lingkaran */
+            border: 1px solid white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
             display: flex;
             justify-content: center;
             align-items: center;
-            text-decoration: none; /* Menghilangkan underline pada link */
+            text-decoration: none;
         }
 
         .social-icon:hover {
-            color: #00BFA6; /* Warna ikon saat hover */
-            background-color: white; /* Warna background saat hover */
+            color: #00BFA6;
+            background-color: white;
         }
 
         @media (max-width: 768px) {
@@ -202,17 +203,17 @@
             .feature-item {
                 padding: 20px 15px;
             }
-            .start-button {
+            .start-button, .secondary-button {
                 font-size: 1.4em;
                 padding: 15px 35px;
             }
             .footer-content {
-                flex-direction: column; /* Menumpuk item secara vertikal */
-                text-align: center; /* Memusatkan teks */
-                gap: 10px; /* Jarak antar item yang ditumpuk */
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
             }
             .footer p {
-                text-align: center; /* Memusatkan teks copyright di layar kecil */
+                text-align: center;
             }
         }
 
@@ -251,12 +252,17 @@
             </div>
             <div class="feature-item">
                 <img src="{{ url_for('static', filename='images/chatbotbr.png') }}" alt="Chatbot Icon">
-                <h3>Chatbot AI</h3>
-                <p>Berinteraksi Langsung dengan Agent AI untuk Memahami Hasil dan Insight</p>
+                <h3>Chatbot AI Interaktif</h3>
+                <p>Berinteraksi Langsung dengan Agent AI untuk Memahami Hasil dan Insight Klasterisasi.</p>
             </div>
         </div>
-
-        <a href="{{ url_for('main_app') }}" class="start-button">Mulai Sekarang</a>
+        <div class="feature-item">
+                <img src="{{ url_for('static', filename='images/sapadapa.png') }}" alt="Sapadapa Icon">
+                <h3>Obrolan AI untuk Analisis Mendalam (SAPADAPA)</h3>
+                <p>Gunakan AI kami untuk membantu Anda dalam Situation Analysis, Problem Analysis, Decision Analysis, dan Potential Problem Analysis data Anda</p>
+            </div>
+        
+        <a href="{{ url_for('sapadapa_page') }}" class="start-button">Mulai Sekarang</a>
     </div>
 
     <footer class="footer">
@@ -264,8 +270,8 @@
             <p>&copy; 2025 Aurinova. All rights reserved.</p>
             <div class="social-icons">
                 <a href="https://www.linkedin.com/in/java-sika-maulana-167387320/" class="social-icon" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-            <a href="https://www.instagram.com/javamlna/" class="social-icon" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
-        </div>
+                <a href="https://www.instagram.com/javamlna/" class="social-icon" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+            </div>
         </div>
     </footer>
 </body>

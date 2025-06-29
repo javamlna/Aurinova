@@ -21,7 +21,7 @@
                 "upload overview visual"
                 "upload chat chat";
             grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
+            grid-template-rows: auto 1fr; /* Adjust rows */
             gap: 20px;
             height: calc(100vh - 40px);
         }
@@ -34,11 +34,11 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            overflow: auto;
+            overflow: hidden; /* Hide overflow on panel */
         }
         
         .panel-content {
-            overflow-y: auto;
+            overflow-y: auto; /* Allow scrolling on content */
             flex-grow: 1;
         }
 
@@ -51,12 +51,12 @@
             margin-top: 0;
             text-align: center;
             flex-shrink: 0;
+            margin-bottom: 20px;
         }
 
         input[type="file"],
         select,
-        input[type="number"],
-        button {
+        input[type="number"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
@@ -66,30 +66,19 @@
             box-sizing: border-box;
         }
         
-        buttonung {
-            background-color: #00BFA6;
+        .upload-button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            background-color: #00BFA6;
             color: white;
             cursor: pointer;
             border-radius: 5px;
             transition: background-color 0.3s ease;
             border: none;
         }
-         buttonung:hover {
-            background-color: #009e8f;
-        }
-
-        button {
-            background-color: #00BFA6;
-            width: 10%;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            border: none;
-        }
-        
-        button:hover {
+        .upload-button:hover {
             background-color: #009e8f;
         }
 
@@ -100,12 +89,13 @@
         }
 
         #featureCheckboxes {
-            max-height: 200px;
+            max-height: 150px;
             overflow-y: auto;
             border: 1px solid #ddd;
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
+            background-color: white;
         }
 
         #featureCheckboxes label {
@@ -118,13 +108,13 @@
             max-width: 100%;
             height: auto;
             border: 1px solid #ccc;
-            margin-top: 20px;
+            margin-top: 10px;
             border-radius: 6px;
             display: none;
         }
 
         .download-button {
-            display: none; /* Hidden by default */
+            display: none;
             margin-top: 15px;
             padding: 10px 15px;
             background: #00BFA6;
@@ -133,7 +123,7 @@
             border-radius: 5px;
             text-align: center;
             width: fit-content;
-            align-self: center; /* Center the download buttons */
+            align-self: center;
         }
         .download-button:hover {
             background-color: #009e8f;
@@ -156,28 +146,24 @@
             margin-top: 20px;
             margin-bottom: 10px;
         }
-
-        .chat-section {
-            padding-bottom: 0;
-        }
+        
         #chatBox {
             display: flex;
             flex-direction: column;
             gap: 10px;
             font-size: 14px;
-            font-family: 'Inter', sans-serif;
             background: #fff;
             border-radius: 6px;
             padding: 10px;
             border: 1px solid #ccc;
-            flex-grow: 1; /* Make chatbox fill available space */
+            flex-grow: 1;
             overflow-y: auto;
             scroll-behavior: smooth;
         }
         .chat-controls {
             display: flex;
             gap: 10px;
-            padding: 15px 0;
+            padding: 15px 0 0 0;
             flex-shrink: 0;
         }
         .chat-controls input {
@@ -186,86 +172,46 @@
         }
         .chat-controls button {
             margin: 0;
+            padding: 10px 20px;
             flex-shrink: 0;
         }
 
-        /* 1. Aturan dasar untuk SEMUA bubble chat */
         .message {
-            max-width: 80%;
-            padding: 10px 15px;
-            border-radius: 18px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            max-width: 75%; padding: 5px 15px; border-radius: 18px;
+            white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
-
-        /* 2. Aturan untuk bubble PENGGUNA (USER) */
-        .message.user {
-            align-self: flex-end;
-            background-color: #DCF8C6;
-            color: #000;
-            border-bottom-right-radius: 4px;
-        }
-
-        /* 3. Aturan untuk bubble BOT - menjadi Flex Container */
-        .message.bot {
-            align-self: flex-start;
-            background-color: #F1F0F0;
-            color: #000;
-            border-bottom-left-radius: 4px;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 8px; /* Jarak KONSISTEN antar elemen */
-        }
-
-        /* 4. PERBAIKAN UNTUK LOADING INDICATOR */
-        .message.bot.loading-indicator {
-            flex-direction: row; /* Paksa kembali menjadi horizontal */
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* 5. PERBAIKAN UNTUK GAP (Reset Agresif) */
-        .message.bot * {
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
-        }
-
-        /* 6. Aturan Spesifik SETELAH Reset */
-        .message.bot ul,
-        .message.bot ol {
-            padding-left: 20px;
-        }
-        .message.bot li {
-            margin-bottom: 5px;
-        }
+        .message.user { align-self: flex-end; background-color: #DCF8C6; color: #000; border-bottom-right-radius: 4px; }
         
-        /* Loading indicator styling (titik-titik) */
+        .message.bot { 
+            align-self: flex-start; background-color: #F1F0F0; color: #000; 
+            border-bottom-left-radius: 4px; text-align: left; 
+        }
+
+        .bot-content {
+            display: flex; flex-direction: column; gap: 5px;
+        }
+
+        .bot-content * { margin: 0; padding: 0; line-height: 1.5; }
+        .bot-content ul, .bot-content ol { padding-left: 20px; }
+        .bot-content li { margin-bottom: 5px; }
+
+        .message.loading-indicator {
+            display: flex; flex-direction: row; align-items: center; gap: 4px;
+        }
         .loading-indicator span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background-color: #555;
-            border-radius: 50%;
-            opacity: 0;
-            animation: blink 1.4s infinite ease-in-out;
+            display: inline-block; width: 6px; height: 6px; background-color: #555;
+            border-radius: 50%; opacity: 0; animation: blink 1.4s infinite ease-in-out;
         }
         .loading-indicator span:nth-child(1) { animation-delay: 0s; }
         .loading-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .loading-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes blink {
-            0%, 75%, 100% { opacity: 0; }
-            25%, 50% { opacity: 1; }
-        }
+        @keyframes blink { 0%, 75%, 100% { opacity: 0; } 25%, 50% { opacity: 1; } }
     </style>
 </head>
 <body>
     <div class="grid-container">
         <div class="panel upload-section">
-            <h2>Unggah Data</h2>
+            <h2>Parameter Analisis</h2>
             <div class="panel-content">
                 <label for="fileInput">1. Pilih File CSV</label>
                 <input type="file" id="fileInput" accept=".csv" onchange="loadCSVHeaders()" />
@@ -280,14 +226,15 @@
                 <input type="number" id="nClusters" min="1" placeholder="Kosongkan untuk otomatis"/>
 
                 <label for="featureCheckboxes">4. Pilih Fitur</label>
-                <div id="featureCheckboxes">Pilih file untuk melihat fitur...</div>
+                <div id="featureCheckboxes"><p style="color: #666; font-style: italic;">Pilih file untuk melihat fitur...</p></div>
 
-                <buttonung onclick="upload()">Unggah & Analisis</buttonung>
+                <button class="upload-button" onclick="upload()">Unggah & Analisis</button>
             </div>
         </div>
         <div class="panel overview-section">
             <h2>Gambaran Umum Data</h2>
             <div class="panel-content" id="overviewTables">
+                
             </div>
             <a id="downloadCsv" class="download-button" href="#" download>Unduh File Hasil</a>
         </div>
@@ -303,7 +250,11 @@
         <div class="panel chat-section">
             <h2>Obrolan dengan AI</h2>
             <div id="chatBox">
-                <div class="message bot">Halo! Saya Nova. Unggah data Anda dan jalankan analisis, lalu tanyakan apa pun tentang hasilnya.</div>
+                <div class="message bot">
+                    <div class="bot-content">
+                        <p>Halo! Saya Nova. Silakan unggah data Anda dan jalankan analisis di panel kiri, lalu tanyakan apa pun tentang hasilnya di sini.</p>
+                    </div>
+                </div>
             </div>
             <div class="chat-controls">
                 <input type="text" id="chatInput" placeholder="Tanyakan tentang hasil..." />
@@ -314,7 +265,7 @@
     <script>
         let currentSessionId = localStorage.getItem('aurinovaMainAppSessionId');
         if (!currentSessionId) {
-            currentSessionId = 'main_app_' + Math.random().toString(36).substring(2, 15);
+            currentSessionId = 'main_app_' + Math.random().toString(36).substring(2, 9);
             localStorage.setItem('aurinovaMainAppSessionId', currentSessionId);
         }
         
@@ -357,33 +308,15 @@
             container.appendChild(heading);
 
             const table = document.createElement('table');
-            const thead = document.createElement('thead');
-            const headerRow = document.createElement('tr');
-            
-            // Use the keys of the first object for headers
-            const headers = Object.keys(obj[Object.keys(obj)[0]] || {});
-            
-            headerRow.innerHTML = `<th>Cluster</th>` + Object.keys(obj).map(k => `<th>${k}</th>`).join('');
-
-            const tbody = document.createElement('tbody');
-            const dataRows = {};
-            for (const cluster in obj) {
-                for (const stat in obj[cluster]) {
-                    if (!dataRows[stat]) dataRows[stat] = [`<td><b>${stat}</b></td>`];
-                    dataRows[stat].push(`<td>${obj[cluster][stat]}</td>`);
-                }
-            }
-            
             // Simplified table creation for cluster counts
             if (title.toLowerCase().includes('jumlah data')) {
-                 const header = `<tr><th>Cluster</th><th>Jumlah Data</th></tr>`;
+                 const header = `<thead><tr><th>Cluster</th><th>Jumlah Data</th></tr></thead>`;
                  const rows = Object.entries(obj).map(([key, value]) => `<tr><td>${key}</td><td>${value}</td></tr>`).join('');
                  table.innerHTML = header + `<tbody>${rows}</tbody>`;
             } else {
-                 // Fallback for other tables, can be improved
-                 table.innerHTML = `<tr><th>Kunci</th><th>Nilai</th></tr>` + Object.entries(obj).map(([key, value]) => `<tr><td>${key}</td><td>${JSON.stringify(value)}</td></tr>`).join('');
+                 // Fallback for other tables
+                 table.innerHTML = `<thead><tr><th>Kunci</th><th>Nilai</th></tr></thead>` + `<tbody>` + Object.entries(obj).map(([key, value]) => `<tr><td>${key}</td><td>${JSON.stringify(value)}</td></tr>`).join('') + `</tbody>`;
             }
-
             container.appendChild(table);
             return container;
         }
@@ -391,17 +324,16 @@
         function appendMessage(sender, message) {
             const chatBox = document.getElementById('chatBox');
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-
-            if (sender === 'user') {
-                messageDiv.classList.add('user');
-                messageDiv.textContent = message;
+            messageDiv.classList.add('message', sender);
+            
+            if (sender === 'bot') {
+                const contentWrapper = document.createElement('div');
+                contentWrapper.className = 'bot-content';
+                contentWrapper.innerHTML = marked.parse(message.trim());
+                messageDiv.appendChild(contentWrapper);
             } else {
-                messageDiv.classList.add('bot');
-                const cleanedMessage = message.trim();
-                messageDiv.innerHTML = marked.parse(cleanedMessage);
+                messageDiv.textContent = message;
             }
-
             chatBox.appendChild(messageDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
@@ -410,7 +342,7 @@
             if (document.querySelector('.loading-indicator')) return;
             const chatBox = document.getElementById('chatBox');
             const loadingMessageDiv = document.createElement('div');
-            loadingMessageDiv.classList.add('message', 'bot', 'loading-indicator');
+            loadingMessageDiv.classList.add('message', 'loading-indicator');
             loadingMessageDiv.innerHTML = `<span></span><span></span><span></span>`;
             chatBox.appendChild(loadingMessageDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
@@ -425,7 +357,6 @@
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text) return;
-
             appendMessage('user', text);
             input.value = '';
             showLoadingIndicator();
@@ -434,11 +365,7 @@
                 const response = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: text,
-                        session_id: currentSessionId,
-                        context: 'clustering_result'
-                    })
+                    body: JSON.stringify({ message: text, session_id: currentSessionId, context: 'clustering_result' })
                 });
                 
                 removeLoadingIndicator();
@@ -478,56 +405,56 @@
             
             // UI Reset
             const overviewDiv = document.getElementById('overviewTables');
-            const visualContent = document.getElementById('visualContent');
+            const visualContent = document.getElementById('visualContent').querySelector('p');
             const img = document.getElementById('clusterPlot');
             const downloadCsv = document.getElementById('downloadCsv');
             const downloadPlot = document.getElementById('downloadPlot');
             const plotErrorMsg = document.getElementById('plotErrorMsg');
 
             overviewDiv.innerHTML = '<p>Memproses...</p>';
-            visualContent.querySelector('p').style.display = 'none'; // hide "visualisasi akan muncul"
+            if (visualContent) visualContent.style.display = 'none';
             img.style.display = 'none';
             plotErrorMsg.textContent = '';
             downloadCsv.style.display = 'none';
             downloadPlot.style.display = 'none';
+            document.getElementById('chatBox').innerHTML = ''; // Clear chat
+            appendMessage('bot', 'Menganalisis data Anda, mohon tunggu...');
+
 
             try {
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await response.json();
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Upload gagal. Periksa terminal server untuk detail.');
+                    throw new Error(data.error || 'Upload gagal. Periksa terminal server untuk detail.');
                 }
-                const data = await response.json();
                 
-                // --- RENDER RESULTS ---
-                overviewDiv.innerHTML = ''; // Clear "Memproses..."
+                overviewDiv.innerHTML = '';
                 if (data.clusters) {
                     overviewDiv.appendChild(createTableFromObject(data.clusters, 'Jumlah Data per Cluster'));
                 }
-                // Add more tables if needed, e.g., for cluster_stats
 
-                // Handle Plot Image
                 if (data.plot_url) {
-                    img.src = data.plot_url + '?' + new Date().getTime(); // Cache-busting
+                    img.src = data.plot_url + '?' + new Date().getTime();
                     img.style.display = 'block';
                     downloadPlot.href = data.plot_url;
                     downloadPlot.style.display = 'inline-block';
                 } else {
-                    plotErrorMsg.textContent = 'Plot tidak dapat dibuat (mungkin karena tidak cukup fitur numerik).';
+                    plotErrorMsg.textContent = 'Plot tidak dapat dibuat (mungkin tidak cukup fitur numerik).';
                 }
 
-                // Handle CSV Download
                 if (data.csv_url) {
                     downloadCsv.href = data.csv_url;
                     downloadCsv.style.display = 'inline-block';
                 }
+                
+                document.getElementById('chatBox').innerHTML = '';
+                appendMessage('bot', 'Analisis selesai! Anda sekarang bisa bertanya tentang hasilnya.');
 
             } catch (error) {
                 overviewDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                document.getElementById('chatBox').innerHTML = '';
+                appendMessage('bot', `Terjadi kesalahan: ${error.message}`);
             }
         }
 

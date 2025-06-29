@@ -58,33 +58,44 @@
             color: #000; 
             border-bottom-left-radius: 4px; 
             text-align: left; 
-            
-            display: inline-flex; /* Membuat bubble menyusut pas dengan kontennya */
-            flex-direction: column; /* Menjaga agar konten di dalamnya tetap tersusun vertikal */
-            gap: 0px; /* Memberi jarak konsisten antar paragraf, list, judul, dll. */
-            max-width: 75%; /* Tetap batasi lebar maksimalnya */
+            width: fit-content; 
+            margin-bottom: 0px;
+            display: flex;
+            flex-direction: column; /* Ditambahkan: Memastikan elemen anak diatur dalam kolom */
+            max-width: 75%;
         }
         
-        /* Reset semua elemen di dalam bubble bot */
         .message.bot * {
-            margin: 0; padding: 0; line-height: 1.5;
+            margin: 0; 
+            padding: 0; 
+            line-height: 1.5;
+        }
+        
+        .message.bot p:not(:last-child),
+        .message.bot h1:not(:last-child),
+        .message.bot h2:not(:last-child),
+        .message.bot h3:not(:last-child),
+        .message.bot h4:not(:last-child),
+        .message.bot h5:not(:last-child),
+        .message.bot h6:not(:last-child),
+        .message.bot div:not(:last-child) { /* Tambahkan div jika marked.js menghasilkan div */
+            margin-bottom: 5px !important; /* Memberi jarak antar paragraf/judul */
         }
 
-        /* Atur ulang list agar terlihat benar */
-        .message.bot ul, .message.bot ol {
-            padding-left: 22px; 
-            margin-bottom: 0px;
+        .message.bot ul, 
+        .message.bot ol {
+            padding-left: 22px !important; /* Pertahankan indentasi untuk list */
+            margin-top: 10px !important; /* Beri jarak di atas list */
+            margin-bottom: 10px !important; /* Beri jarak di bawah list */
         }
 
-        /* Beri jarak antar item di dalam list */
-        .message.bot li {
-            margin-bottom: 0px; 
+        .message.bot li:not(:last-child) {
+            margin-bottom: 5px !important; /* Jarak antar item daftar */
         }
+
+        /* Pastikan list item terakhir tidak punya margin-bottom ekstra */
         .message.bot li:last-child {
-            margin-bottom: 0px;
-        }
-        .message.bot > *:not(:last-child) {
-            margin-bottom: 0px; 
+            margin-bottom: 0 !important;
         }
 
         /* Aturan terpisah untuk loading indicator */

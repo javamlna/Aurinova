@@ -19,14 +19,18 @@
         .grid-container {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(5, 1fr);
+            grid-template-rows: repeat(9, 1fr);
             grid-template-areas:
                 "upload upload overview overview visual visual"
                 "upload upload overview overview visual visual"
+                "upload upload overview overview visual visual"
+                "upload upload overview overview visual visual"
+                "upload upload chat chat chat chat"
+                "upload upload chat chat chat chat"
                 "upload upload chat chat chat chat"
                 "upload upload chat chat chat chat"
                 "upload upload chat chat chat chat";
-            gap: 20px;
+            gap: 10px;
             height: calc(100vh - 40px);
         }
 
@@ -182,19 +186,29 @@
             width: fit-content; 
             margin-bottom: 0px;
             display: inline-flex;
+            flex-direction: column; /* Ditambahkan: Memastikan elemen anak diatur dalam kolom */
         }
         
         .message.bot * {
-            margin: 0; padding: 0; line-height: 1.5;margin-bottom: 0px;
+            margin: 0; padding: 0; line-height: 1.5;
         }
         
+        /* Direvisi: Menghapus margin-bottom yang membuat "kolom" */
         .message.bot > *:not(:last-child) {
-            margin-bottom: 10px; 
+            margin-bottom: 0px; 
+        }
+
+        /* Ditambahkan: Mereset margin default browser untuk P, UL, OL, LI */
+        .message.bot p,
+        .message.bot ul,
+        .message.bot ol,
+        .message.bot li {
+            margin-top: 0;
+            margin-bottom: 0;
         }
 
         .message.bot ul, .message.bot ol {
             padding-left: 22px; 
-            margin-bottom: 0px;
         }
 
         .message.bot li {
@@ -332,6 +346,10 @@
             messageDiv.classList.add('message', sender);
             
             if (sender === 'bot') {
+                // Di sini, Anda bisa menambahkan logika preprocessing jika respons AI sering menggunakan baris baru untuk memisahkan kalimat
+                // Contoh: Mengganti baris baru ganda dengan satu spasi untuk menghindari paragraf terpisah yang tidak diinginkan
+                // Namun, ini bisa menghilangkan format daftar jika AI memang bermaksud membuat daftar.
+                // Untuk saat ini, kita hanya akan mengandalkan CSS untuk mengurangi jarak antar elemen.
                 messageDiv.innerHTML = marked.parse(message.trim());
             } else {
                 messageDiv.textContent = message;
@@ -419,8 +437,8 @@
             plotErrorMsg.textContent = '';
             downloadCsv.style.display = 'none';
             downloadPlot.style.display = 'none';
-            document.getElementById('chatBox').innerHTML = '';
-            appendMessage('bot', 'Menganalisis data Anda, mohon tunggu...');
+            document.getElementById('chatBox').innerHTML = ''; // Membersihkan chatbox
+            appendMessage('bot', 'Menganalisis data Anda, mohon tunggu...'); // Menambahkan pesan awal
 
             try {
                 const response = await fetch('/upload', { method: 'POST', body: formData });
@@ -449,12 +467,12 @@
                     downloadCsv.style.display = 'inline-block';
                 }
                 
-                document.getElementById('chatBox').innerHTML = '';
+                document.getElementById('chatBox').innerHTML = ''; // Membersihkan chatbox lagi setelah analisis selesai
                 appendMessage('bot', 'Analisis selesai! Anda sekarang bisa bertanya tentang hasilnya.');
 
             } catch (error) {
                 overviewDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
-                document.getElementById('chatBox').innerHTML = '';
+                document.getElementById('chatBox').innerHTML = ''; // Membersihkan chatbox saat error
                 appendMessage('bot', `Terjadi kesalahan: ${error.message}`);
             }
         }

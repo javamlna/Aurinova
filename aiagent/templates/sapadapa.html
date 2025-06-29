@@ -53,40 +53,48 @@
         }
         
         .message.bot { 
-            /* ... kode yang sudah ada ... */
-            display: flex; /* Sudah benar */
-            flex-direction: column; /* Sudah benar */
-            /* Hapus 'gap' di sini jika ada, kita akan atur jaraknya secara manual pada child elements */
-            max-width: 75%; /* Sesuaikan lagi sesuai kebutuhan */
+            align-self: flex-start; 
+            background-color: #F1F0F0; 
+            color: #000; 
+            border-bottom-left-radius: 4px; 
+            text-align: left; 
+            width: fit-content; 
+            margin-bottom: 0px;
+            display: flex;
+            flex-direction: column; /* Ditambahkan: Memastikan elemen anak diatur dalam kolom */
+            max-width: 75%;
         }
-                
+        
         .message.bot * {
-            margin: 0 !important; /* Pastikan semua margin direset */
-            padding: 0 !important; /* Pastikan semua padding direset */
+            margin: 0; 
+            padding: 0; 
             line-height: 1.5;
         }
-
-        /* Tambahkan/revisi ini untuk mengontrol UL/OL secara eksplisit */
-        .message.bot ul, 
-        .message.bot ol {
-            padding-left: 22px !important; /* Pertahankan indentasi */
-            margin-top: 5px !important;    /* Memberi jarak sedikit di atas list secara keseluruhan */
-            margin-bottom: 5px !important; /* Memberi jarak sedikit di bawah list secara keseluruhan */
+        
+        .message.bot p:not(:last-child),
+        .message.bot h1:not(:last-child),
+        .message.bot h2:not(:last-child),
+        .message.bot h3:not(:last-child),
+        .message.bot h4:not(:last-child),
+        .message.bot h5:not(:last-child),
+        .message.bot h6:not(:last-child),
+        .message.bot div:not(:last-child) { /* Tambahkan div jika marked.js menghasilkan div */
+            margin-bottom: 5px !important; /* Memberi jarak antar paragraf/judul */
         }
 
-        /* Beri jarak antar item di dalam list */
+        .message.bot ul, 
+        .message.bot ol {
+            padding-left: 22px !important; /* Pertahankan indentasi untuk list */
+            margin-top: 10px !important; /* Beri jarak di atas list */
+            margin-bottom: 10px !important; /* Beri jarak di bawah list */
+        }
+
         .message.bot li:not(:last-child) {
             margin-bottom: 5px !important; /* Jarak antar item daftar */
         }
 
-        /* Jika Anda ingin paragraf memiliki jarak juga, pertahankan yang ini. 
-        Jika tidak, Anda bisa menghapus margin-bottom di sini juga */
-        .message.bot p:not(:last-child) { 
-            margin-bottom: 5px !important; /* Jarak antar paragraf */
-        }
-
-        /* Pastikan elemen terakhir dalam bubble tidak punya margin-bottom ekstra */
-        .message.bot > *:last-child {
+        /* Pastikan list item terakhir tidak punya margin-bottom ekstra */
+        .message.bot li:last-child {
             margin-bottom: 0 !important;
         }
 

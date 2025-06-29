@@ -21,7 +21,7 @@
                 "upload overview visual"
                 "upload chat chat";
             grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: auto 1fr; /* Adjust rows */
+            grid-template-rows: auto 1fr;
             gap: 20px;
             height: calc(100vh - 40px);
         }
@@ -34,11 +34,11 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Hide overflow on panel */
+            overflow: hidden; 
         }
         
         .panel-content {
-            overflow-y: auto; /* Allow scrolling on content */
+            overflow-y: auto;
             flex-grow: 1;
         }
 
@@ -69,6 +69,7 @@
         .upload-button {
             width: 100%;
             padding: 12px;
+            margin-bottom: 0;
             font-size: 1.1em;
             font-weight: 600;
             background-color: #00BFA6;
@@ -78,9 +79,7 @@
             transition: background-color 0.3s ease;
             border: none;
         }
-        .upload-button:hover {
-            background-color: #009e8f;
-        }
+        .upload-button:hover { background-color: #009e8f; }
 
         label {
             font-weight: bold;
@@ -97,103 +96,82 @@
             margin-bottom: 20px;
             background-color: white;
         }
-
         #featureCheckboxes label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: normal;
+            display: block; margin-bottom: 5px; font-weight: normal;
         }
 
         #clusterPlot {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-            border-radius: 6px;
-            display: none;
+            max-width: 100%; height: auto; border: 1px solid #ccc;
+            margin-top: 10px; border-radius: 6px; display: none;
         }
-
         .download-button {
-            display: none;
-            margin-top: 15px;
-            padding: 10px 15px;
-            background: #00BFA6;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            text-align: center;
-            width: fit-content;
+            display: none; margin-top: 15px; padding: 10px 15px;
+            background: #00BFA6; color: white; text-decoration: none;
+            border-radius: 5px; text-align: center; width: fit-content;
             align-self: center;
         }
-        .download-button:hover {
-            background-color: #009e8f;
-        }
+        .download-button:hover { background-color: #009e8f; }
 
         #overviewTables table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 15px;
+            border-collapse: collapse; width: 100%; margin-top: 15px;
         }
         #overviewTables th, #overviewTables td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
+            border: 1px solid #ccc; padding: 8px; text-align: left;
         }
-        #overviewTables th {
-            background-color: #f0f0f0;
-        }
-        #overviewTables h3 {
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-        
+        #overviewTables th { background-color: #f0f0f0; }
+        #overviewTables h3 { margin-top: 20px; margin-bottom: 10px; }
+
         #chatBox {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 14px;
-            background: #fff;
-            border-radius: 6px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            flex-grow: 1;
-            overflow-y: auto;
-            scroll-behavior: smooth;
+            display: flex; flex-direction: column; gap: 10px; font-size: 14px;
+            background: #fff; border-radius: 6px; padding: 10px; border: 1px solid #ccc;
+            flex-grow: 1; overflow-y: auto; scroll-behavior: smooth;
         }
         .chat-controls {
-            display: flex;
-            gap: 10px;
-            padding: 15px 0 0 0;
-            flex-shrink: 0;
+            display: flex; gap: 10px; padding: 15px 0 0 0; flex-shrink: 0;
         }
         .chat-controls input {
-            flex-grow: 1;
-            margin: 0;
+            flex-grow: 1; margin: 0; padding: 10px; font-size: 1em;
+            border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;
         }
         .chat-controls button {
-            margin: 0;
-            padding: 10px 20px;
-            flex-shrink: 0;
+            margin: 0; padding: 10px 20px; flex-shrink: 0;
+            background-color: #00BFA6; color: white; cursor: pointer;
+            transition: background-color 0.3s ease; border: none; border-radius: 5px;
         }
+        .chat-controls button:hover { background-color: #009e8f; }
 
         .message {
-            max-width: 75%; padding: 5px 15px; border-radius: 18px;
+            max-width: 80%; padding: 10px 15px; border-radius: 18px;
             white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
-        .message.user { align-self: flex-end; background-color: #DCF8C6; color: #000; border-bottom-right-radius: 4px; }
+        .message.user { 
+            align-self: flex-end; background-color: #DCF8C6; color: #000; border-bottom-right-radius: 4px;
+        }
         
         .message.bot { 
             align-self: flex-start; background-color: #F1F0F0; color: #000; 
             border-bottom-left-radius: 4px; text-align: left; 
+            /* PERUBAHAN UTAMA: Gunakan inline-flex agar bubble pas dengan kontennya */
+            display: inline-flex;
+            flex-direction: column;
+            gap: 10px; /* Jarak antar elemen di dalam bubble */
+            max-width: 80%; /* Pastikan tidak melebihi batas */
+        }
+        
+        .message.bot > * {
+            margin: 0; padding: 0; line-height: 1.5;
         }
 
-        .bot-content {
-            display: flex; flex-direction: column; gap: 5px;
+        .message.bot ul, .message.bot ol {
+            padding-left: 22px; 
         }
 
-        .bot-content * { margin: 0; padding: 0; line-height: 1.5; }
-        .bot-content ul, .bot-content ol { padding-left: 20px; }
-        .bot-content li { margin-bottom: 5px; }
+        .message.bot li {
+            margin-bottom: 5px; 
+        }
+        .message.bot li:last-child {
+             margin-bottom: 0;
+        }
 
         .message.loading-indicator {
             display: flex; flex-direction: row; align-items: center; gap: 4px;
@@ -234,14 +212,14 @@
         <div class="panel overview-section">
             <h2>Gambaran Umum Data</h2>
             <div class="panel-content" id="overviewTables">
-                
+                <p>Hasil analisis akan muncul di sini setelah Anda mengunggah data.</p>
             </div>
             <a id="downloadCsv" class="download-button" href="#" download>Unduh File Hasil</a>
         </div>
         <div class="panel visual-section">
             <h2>Hasil Klasterisasi</h2>
             <div class="panel-content" id="visualContent">
-            
+                <p>Visualisasi plot akan muncul di sini.</p>
                 <img id="clusterPlot" alt="Hasil plot klasterisasi"/>
                 <p id="plotErrorMsg" style="color: red;"></p>
             </div>
@@ -251,9 +229,7 @@
             <h2>Obrolan dengan AI</h2>
             <div id="chatBox">
                 <div class="message bot">
-                    <div class="bot-content">
-                        <p>Halo! Saya Nova. Silakan unggah data Anda dan jalankan analisis di panel kiri, lalu tanyakan apa pun tentang hasilnya di sini.</p>
-                    </div>
+                    <p>Halo! Saya Nova. Silakan unggah data Anda dan jalankan analisis di panel kiri, lalu tanyakan apa pun tentang hasilnya di sini.</p>
                 </div>
             </div>
             <div class="chat-controls">
@@ -288,7 +264,7 @@
                 featureCheckboxesContainer.innerHTML = '';
                 
                 headers.forEach(h => {
-                    if (!h) return; // Skip empty headers
+                    if (!h) return;
                     const label = document.createElement('label');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
@@ -308,29 +284,26 @@
             container.appendChild(heading);
 
             const table = document.createElement('table');
-            // Simplified table creation for cluster counts
             if (title.toLowerCase().includes('jumlah data')) {
                  const header = `<thead><tr><th>Cluster</th><th>Jumlah Data</th></tr></thead>`;
                  const rows = Object.entries(obj).map(([key, value]) => `<tr><td>${key}</td><td>${value}</td></tr>`).join('');
                  table.innerHTML = header + `<tbody>${rows}</tbody>`;
             } else {
-                 // Fallback for other tables
                  table.innerHTML = `<thead><tr><th>Kunci</th><th>Nilai</th></tr></thead>` + `<tbody>` + Object.entries(obj).map(([key, value]) => `<tr><td>${key}</td><td>${JSON.stringify(value)}</td></tr>`).join('') + `</tbody>`;
             }
             container.appendChild(table);
             return container;
         }
 
+        // --- FUNGSI appendMessage YANG DIPERBARUI ---
         function appendMessage(sender, message) {
             const chatBox = document.getElementById('chatBox');
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender);
             
             if (sender === 'bot') {
-                const contentWrapper = document.createElement('div');
-                contentWrapper.className = 'bot-content';
-                contentWrapper.innerHTML = marked.parse(message.trim());
-                messageDiv.appendChild(contentWrapper);
+                // Jangan lagi membungkus dengan .bot-content
+                messageDiv.innerHTML = marked.parse(message.trim());
             } else {
                 messageDiv.textContent = message;
             }
@@ -403,23 +376,21 @@
             const nClusters = document.getElementById('nClusters').value;
             if (nClusters) formData.append('n_clusters', nClusters);
             
-            // UI Reset
             const overviewDiv = document.getElementById('overviewTables');
-            const visualContent = document.getElementById('visualContent').querySelector('p');
+            const visualContentP = document.getElementById('visualContent').querySelector('p');
             const img = document.getElementById('clusterPlot');
             const downloadCsv = document.getElementById('downloadCsv');
             const downloadPlot = document.getElementById('downloadPlot');
             const plotErrorMsg = document.getElementById('plotErrorMsg');
 
             overviewDiv.innerHTML = '<p>Memproses...</p>';
-            if (visualContent) visualContent.style.display = 'none';
+            if (visualContentP) visualContentP.style.display = 'none';
             img.style.display = 'none';
             plotErrorMsg.textContent = '';
             downloadCsv.style.display = 'none';
             downloadPlot.style.display = 'none';
-            document.getElementById('chatBox').innerHTML = ''; // Clear chat
+            document.getElementById('chatBox').innerHTML = '';
             appendMessage('bot', 'Menganalisis data Anda, mohon tunggu...');
-
 
             try {
                 const response = await fetch('/upload', { method: 'POST', body: formData });

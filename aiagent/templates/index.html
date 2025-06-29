@@ -17,12 +17,15 @@
 
         .grid-container {
             display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(5, 1fr);
             grid-template-areas:
-                "upload overview visual"
-                "upload chat chat";
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: auto 1fr;
-            gap: 20px;
+                "upload upload overview overview visual visual"
+                "upload upload overview overview visual visual"
+                "upload upload chat chat chat chat"
+                "upload upload chat chat chat chat"
+                "upload upload chat chat chat chat";
+            gap: 10px;
             height: calc(100vh - 40px);
         }
 
@@ -34,7 +37,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            overflow: hidden; 
+            overflow: hidden;
         }
         
         .panel-content {
@@ -54,6 +57,7 @@
             margin-bottom: 20px;
         }
 
+        /* General form styles */
         input[type="file"],
         select,
         input[type="number"] {
@@ -120,6 +124,7 @@
         }
         #overviewTables th { background-color: #f0f0f0; }
         #overviewTables h3 { margin-top: 20px; margin-bottom: 10px; }
+        
 
         #chatBox {
             display: flex; flex-direction: column; gap: 10px; font-size: 14px;
@@ -144,28 +149,29 @@
             max-width: 80%; padding: 10px 15px; border-radius: 18px;
             white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
-        .message.user { 
-            align-self: flex-end; background-color: #DCF8C6; color: #000; border-bottom-right-radius: 4px;
-        }
+        .message.user { align-self: flex-end; background-color: #DCF8C6; color: #000; border-bottom-right-radius: 4px; }
         
         .message.bot { 
             align-self: flex-start; background-color: #F1F0F0; color: #000; 
             border-bottom-left-radius: 4px; text-align: left; 
-            /* PERUBAHAN UTAMA: Gunakan inline-flex agar bubble pas dengan kontennya */
             display: inline-flex;
-            flex-direction: column;
-            gap: 10px; /* Jarak antar elemen di dalam bubble */
-            max-width: 80%; /* Pastikan tidak melebihi batas */
+            max-width: 80%;
         }
         
-        .message.bot > * {
+        .message.bot * {
             margin: 0; padding: 0; line-height: 1.5;
         }
+        
+        .message.bot > *:not(:last-child) {
+            margin-bottom: 10px; 
+        }
 
+        /* 3. Atur ulang list agar terlihat benar */
         .message.bot ul, .message.bot ol {
             padding-left: 22px; 
         }
 
+        /* 4. Atur jarak antar item di dalam list */
         .message.bot li {
             margin-bottom: 5px; 
         }
@@ -173,6 +179,7 @@
              margin-bottom: 0;
         }
 
+        /* Aturan terpisah untuk loading indicator */
         .message.loading-indicator {
             display: flex; flex-direction: row; align-items: center; gap: 4px;
         }
@@ -264,7 +271,7 @@
                 featureCheckboxesContainer.innerHTML = '';
                 
                 headers.forEach(h => {
-                    if (!h) return;
+                    if (!h) return; 
                     const label = document.createElement('label');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
@@ -295,14 +302,12 @@
             return container;
         }
 
-        // --- FUNGSI appendMessage YANG DIPERBARUI ---
         function appendMessage(sender, message) {
             const chatBox = document.getElementById('chatBox');
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender);
             
             if (sender === 'bot') {
-                // Jangan lagi membungkus dengan .bot-content
                 messageDiv.innerHTML = marked.parse(message.trim());
             } else {
                 messageDiv.textContent = message;
@@ -376,6 +381,7 @@
             const nClusters = document.getElementById('nClusters').value;
             if (nClusters) formData.append('n_clusters', nClusters);
             
+            // UI Reset
             const overviewDiv = document.getElementById('overviewTables');
             const visualContentP = document.getElementById('visualContent').querySelector('p');
             const img = document.getElementById('clusterPlot');

@@ -60,7 +60,7 @@
             
             display: inline-flex; /* Membuat bubble menyusut pas dengan kontennya */
             flex-direction: column; /* Menjaga agar konten di dalamnya tetap tersusun vertikal */
-            gap: 10px; /* Memberi jarak konsisten antar paragraf, list, judul, dll. */
+            gap: 2px; /* Memberi jarak konsisten antar paragraf, list, judul, dll. */
             max-width: 75%; /* Tetap batasi lebar maksimalnya */
         }
         
@@ -72,11 +72,12 @@
         /* Atur ulang list agar terlihat benar */
         .message.bot ul, .message.bot ol {
             padding-left: 22px; 
+            margin-bottom: 2px;
         }
 
         /* Beri jarak antar item di dalam list */
         .message.bot li {
-            margin-bottom: 5px; 
+            margin-bottom: 2px; 
         }
         .message.bot li:last-child {
              margin-bottom: 0;

@@ -104,7 +104,6 @@
             display: block; margin-bottom: 5px; font-weight: normal;
         }
 
-        /* --- PERBAIKAN PADA VISUAL & TABLE --- */
         #visualContent {
             display: flex;
             flex-direction: column;
@@ -113,12 +112,16 @@
             height: 100%;
         }
         #clusterPlot {
-            max-width: 100%;
-            max-height: calc(100% - 60px); /* Adjust height to leave space for button */
+            max-width: 80%;
             border: 1px solid #ccc;
+            margin: 5px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto;
             border-radius: 6px;
             display: none;
-            object-fit: contain; /* Key property to scale the image down to fit */
+            flex-shrink: 0;
         }
         .download-button {
             display: none; margin-top: 15px; padding: 10px 15px;
@@ -129,13 +132,19 @@
         .download-button:hover { background-color: #009e8f; }
 
         #overviewTables table {
-            border-collapse: collapse; width: 100%; margin-top: 15px;
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px 25px 5px 5px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto
         }
+        
         #overviewTables th, #overviewTables td {
-            border: 1px solid #ccc; 
-            padding: 6px; /* Reduced padding */
-            text-align: left;
-            font-size: 13px; /* Slightly smaller font */
+            border: 1px solid #ccc;
+            padding: 3px;
+            text-align: center;
         }
         #overviewTables th { background-color: #f0f0f0; font-weight: 600; }
         #overviewTables h3 { margin-top: 20px; margin-bottom: 10px; }

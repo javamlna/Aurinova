@@ -10,122 +10,37 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #fdf7f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            width: 100vw;
-            overflow-x: hidden;
-            color: #333;
-            text-align: center;
-            box-sizing: border-box;
-            z-index: 1;
+            font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: #fdf7f0;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            width: 100vw; overflow-x: hidden; color: #333; text-align: center;
         }
-
         .header-section {
-            background-color: #00BFA6;
-            color: white;
-            padding: 35px 20px 100px 10px;
-            width: 100%;
-            max-width: 1700px;
-            box-sizing: border-box;
-            border-bottom-left-radius: 0px;
-            border-bottom-right-radius: 0px;
-            position: relative;
-            z-index: 1;
+            background-color: #00BFA6; color: white; padding: 35px 20px 100px 10px;
+            width: 100%; max-width: 1700px; box-sizing: border-box; position: relative; z-index: 1;
         }
-        .header-section h1 {
-            font-size: 3em;
-            margin-bottom: 2px;
-            margin-top: 1px;
-            letter-spacing: -2px;
-        }
-        .header-section p {
-            font-size: 1.2em;
-            line-height: 1.3;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
+        .header-section h1 { font-size: 3em; margin: 1px 0 2px 0; letter-spacing: -2px; }
+        .header-section p { font-size: 1.2em; line-height: 1.3; max-width: 1000px; margin: 0 auto; }
         .main-content {
-            background-color: #ffffff;
-            padding: 30px 55px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            max-width: 2000px;
-            width: 95%;
-            margin-top: -50px;
-            position: relative;
-            z-index: 3;
-            box-sizing: border-box;
+            background-color: #ffffff; padding: 30px 55px; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); max-width: 2000px;
+            width: 95%; margin-top: -50px; position: relative; z-index: 3; box-sizing: border-box;
         }
-
-        .sapadapa-intro {
-            margin-bottom: 40px;
-        }
-        .sapadapa-intro h2 {
-            color: #00BFA6;
-            font-size: 2.2em;
-            margin-bottom: 15px;
-        }
-        .sapadapa-intro p {
-            font-size: 1.1em;
-            line-height: 1.6;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .sapadapa-steps {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
-            margin-top: 30px;
-            margin-bottom: 40px;
-        }
-
+        .sapadapa-intro { margin-bottom: 40px; }
+        .sapadapa-intro h2 { color: #00BFA6; font-size: 2.2em; margin-bottom: 15px; }
+        .sapadapa-intro p { font-size: 1.1em; line-height: 1.6; max-width: 900px; margin: 0 auto; }
+        .sapadapa-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin: 30px 0 40px 0; }
         .step-item {
-            background-color: #f8fcfd;
-            padding: 25px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            text-align: center;
+            background-color: #f8fcfd; padding: 25px 20px; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); text-align: center;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .step-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        }
-        .step-item h3 {
-            color: #34495e;
-            font-size: 1.3em;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        .step-item p {
-            font-size: 0.95em;
-            color: #7f8c8d;
-            line-height: 1.5;
-        }
-
+        .step-item:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); }
+        .step-item h3 { color: #34495e; font-size: 1.3em; margin: 0 0 10px 0; }
+        .step-item p { font-size: 0.95em; color: #7f8c8d; line-height: 1.5; }
         #chatBox {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 14px;
-            font-family: 'Poppins', sans-serif;
-            background: #fff;
-            border-radius: 6px;
-            padding: 10px;
-            height: 250px;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-            border: 1px solid #ccc;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            display: flex; flex-direction: column; gap: 10px; font-size: 14px;
+            background: #fff; border-radius: 6px; padding: 10px; height: 250px;
+            overflow-y: auto; scroll-behavior: smooth; border: 1px solid #ccc; margin: 20px 0;
         }
 
         .message {
@@ -133,41 +48,38 @@
             white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
         }
         .message.user { align-self: flex-end; background-color: #DCF8C6; color: #000; border-bottom-right-radius: 4px; }
-        .message.bot { align-self: flex-start; background-color: #F1F0F0; color: #000; border-bottom-left-radius: 4px; text-align: left; }
-
-        .message.bot * {
-            margin: 0 !important;
-            padding: 0 !important;
-            line-height: 1.5; 
-        }
-
-        .message.bot p,
-        .message.bot ul,
-        .message.bot ol,
-        .message.bot h1,
-        .message.bot h2,
-        .message.bot h3,
-        .message.bot h4,
-        .message.bot h5,
-        .message.bot h6 {
-            margin-bottom: 12px !important; 
-        }
         
-        .message.bot > *:last-child {
-            margin-bottom: 0 !important;
+
+        .message.bot { 
+            align-self: flex-start; 
+            background-color: #F1F0F0; 
+            color: #000; 
+            border-bottom-left-radius: 4px; 
+            text-align: left; 
         }
 
-        .message.bot ul,
-        .message.bot ol {
-            padding-left: 20px !important; 
-            list-style-position: outside;
+        .bot-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
         }
 
-        .message.bot li {
-            margin-bottom: 5px !important; /* Jarak antar item di dalam list */
+        .bot-content * {
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
         }
-        
-        .message.bot.loading-indicator {
+
+        .bot-content ul,
+        .bot-content ol {
+            padding-left: 20px; 
+        }
+
+        .bot-content li {
+            margin-bottom: 5px; 
+        }
+
+        .message.loading-indicator {
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -178,251 +90,72 @@
             display: inline-block; width: 6px; height: 6px; background-color: #555;
             border-radius: 50%; opacity: 0; animation: blink 1.4s infinite ease-in-out;
         }
-
         .loading-indicator span:nth-child(1) { animation-delay: 0s; }
         .loading-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .loading-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%, 75%, 100% { opacity: 0; } 25%, 50% { opacity: 1; } }
 
-        @keyframes blink {
-            0%, 75%, 100% { opacity: 0; }
-            25%, 50% { opacity: 1; }
-        }
-
-
-        .chat-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-        .chat-controls input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 1em;
-        }
+        /* Sisa styling lainnya... */
+        .chat-controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .chat-controls input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; }
         .chat-controls button {
-            padding: 10px 20px;
-            background-color: #00BFA6;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 1em;
-            margin-bottom: 0;
+            padding: 10px 20px; background-color: #00BFA6; color: white; border: none;
+            border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;
+            font-size: 1em; margin-bottom: 0;
         }
-        .chat-controls button:hover {
-            background-color: #009e8f;
-        }
-
+        .chat-controls button:hover { background-color: #009e8f; }
         .back-button {
-            background-color: #f0f0f0;
-            color: #333;
-            padding: 12px 30px;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            display: inline-block;
-            margin-top: 30px;
+            background-color: #f0f0f0; color: #333; padding: 12px 30px; border: 1px solid #ccc;
+            border-radius: 25px; font-size: 1.1em; font-weight: 500; cursor: pointer;
+            text-decoration: none; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-block; margin-top: 30px;
         }
-        .back-button:hover {
-            background-color: #e0e0e0;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-
+        .back-button:hover { background-color: #e0e0e0; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); }
         .footer {
-            margin-top: 50px;
-            padding: 20px;
-            background-color: #00BFA6;
-            color: white;
-            font-size: 0.85em;
-            width: 100%;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 0;
-            display: flex;
-            justify-content: center;
+            margin-top: 50px; padding: 20px; background-color: #00BFA6; color: white;
+            font-size: 0.85em; width: 100%; box-sizing: border-box; position: relative;
+            z-index: 0; display: flex; justify-content: center;
         }
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 1700px;
-            padding: 0 20px;
-        }
-        .footer p {
-            margin: 0;
-            line-height: 1.5;
-            text-align: left;
-        }
-        .social-icons {
-            display: flex;
-            gap: 10px;
-        }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1700px; padding: 0 20px; }
+        .footer p { margin: 0; line-height: 1.5; text-align: left; }
+        .social-icons { display: flex; gap: 10px; }
         .social-icon {
-            font-size: 1.5em;
-            color: white;
-            transition: color 0.3s ease, background-color 0.3s ease;
-            border: 1px solid white;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
+            font-size: 1.5em; color: white; transition: color 0.3s ease, background-color 0.3s ease;
+            border: 1px solid white; border-radius: 50%; width: 35px; height: 35px;
+            display: flex; justify-content: center; align-items: center; text-decoration: none;
         }
-        .social-icon:hover {
-            color: #00BFA6;
-            background-color: white;
-        }
-
+        .social-icon:hover { color: #00BFA6; background-color: white; }
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);
+            justify-content: center; align-items: center;
         }
-
         .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 30px;
-            border: 1px solid #888;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-            text-align: left;
+            background-color: #fefefe; margin: auto; padding: 30px; border: 1px solid #888;
+            border-radius: 10px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative; text-align: left;
         }
-
         .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            cursor: pointer;
+            color: #aaa; float: right; font-size: 28px; font-weight: bold;
+            position: absolute; top: 10px; right: 20px; cursor: pointer;
         }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .modal-content label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .modal-content input[type="file"] {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        
+        .close-button:hover, .close-button:focus { color: black; text-decoration: none; cursor: pointer; }
+        .modal-content label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        .modal-content input[type="file"] { width: calc(100% - 20px); padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
         .modal-content button {
-            background-color: #00BFA6;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
+            background-color: #00BFA6; color: white; padding: 12px 25px; border: none;
+            border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.3s ease;
             margin-top: 10px;
         }
-        .modal-content button:hover {
-            background-color: #009e8f;
-        }
-        
-        .upload-plus-button {
-            background: none;
-            border: none;
-            color: #00BFA6;
-            font-size: 1.8em;
-            cursor: pointer;
-            padding: 0;
-            margin-right: 5px;
-            transition: color 0.3s ease;
-        }
-        .upload-plus-button:hover {
-            color: #009e8f;
-        }
-        
-        .upload-summary { 
-            background-color: #e0f2f1;
-            border-left: 5px solid #00BFA6;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: left;
-            border-radius: 8px;
-            font-size: 0.9em;
-            color: #333;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .upload-summary h4 {
-            margin-top: 0;
-            color: #00796B;
-            font-size: 1.1em;
-        }
-        .upload-summary pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Poppins', sans-serif;
-        }
-        .reset-chat-button {
-            background: none;
-            border: none;
-            color: #FF5722;
-            font-size: 1.8em;
-            cursor: pointer;
-            padding: 0;
-            margin-left: 5px;
-            transition: color 0.3s ease;
-        }
-        .reset-chat-button:hover {
-            color: #E64A19;
-        }
-
+        .modal-content button:hover { background-color: #009e8f; }
+        .upload-plus-button { background: none; border: none; color: #00BFA6; font-size: 1.8em; cursor: pointer; padding: 0; margin-right: 5px; transition: color 0.3s ease; }
+        .upload-plus-button:hover { color: #009e8f; }
+        .reset-chat-button { background: none; border: none; color: #FF5722; font-size: 1.8em; cursor: pointer; padding: 0; margin-left: 5px; transition: color 0.3s ease; }
+        .reset-chat-button:hover { color: #E64A19; }
         @media (max-width: 768px) {
-            .sapadapa-steps {
-                grid-template-columns: 1fr;
-            }
-            .modal-content {
-                padding: 20px;
-                width: 95%;
-            }
-            .modal-content input, .modal-content select, .modal-content button {
-                width: 100%;
-                max-width: none;
-            }
+            .sapadapa-steps { grid-template-columns: 1fr; }
+            .modal-content { padding: 20px; width: 95%; }
+            .modal-content input, .modal-content button { width: 100%; max-width: none; }
         }
     </style>
 </head>
@@ -431,51 +164,28 @@
         <h1>Aurinova</h1>
         <p>Pendekatan Sistematis untuk Analisis Data Klasterisasi dengan Bantuan AI Chatbot</p>
     </div>
-
     <div class="main-content">
         <div class="sapadapa-intro">
             <h2>Pahami Data Anda Lebih Dalam dengan SAPADAPA</h2>
             <p>Aurinova mengintegrasikan kerangka Situation Analysis, Problem Analysis, Decision Analysis, dan Potential Problem Analysis ke dalam proses klasterisasi Anda. Chatbot AI kami akan memandu Anda memahami setiap tahap, mengubah hasil data mentah menjadi wawasan yang dapat ditindaklanjuti.</p>
         </div>
-
         <div class="sapadapa-steps">
-            <div class="step-item">
-                <h3>Situation Analysis (Analisis Situasi)</h3>
-                <p>Identifikasi dan pahami kondisi saat ini dari data klaster Anda. Chatbot akan membantu Anda mengidentifikasi variabel kunci, tren, dan pola awal yang muncul dari pengelompokan data.</p>
-            </div>
-            <div class="step-item">
-                <h3>Problem Analysis (Analisis Masalah)</h3>
-                <p>Setelah situasi dipahami, fokus pada potensi masalah atau anomali dalam klaster. AI akan membantu Anda menganalisis perbedaan antar klaster untuk menemukan area yang memerlukan perhatian khusus.</p>
-            </div>
-            <div class="step-item">
-                <h3>Decision Analysis (Analisis Keputusan)</h3>
-                <p>Evaluasi opsi-opsi berdasarkan wawasan yang diperoleh dari klaster. Chatbot kami akan memberikan saran atau memfasilitasi diskusi tentang tindakan yang paling efektif untuk mencapai tujuan Anda.</p>
-            </div>
-            <div class="step-item">
-                <h3>Potential Problem Analysis (Analisis Potensi Masalah)</h3>
-                <p>Antisipasi dan mitigasi risiko yang mungkin timbul dari keputusan yang diambil atau pola yang teridentifikasi. AI akan membantu Anda memprediksi hambatan dan merencanakan tindakan pencegahan.</p>
-            </div>
+            <div class="step-item"><h3>Situation Analysis (Analisis Situasi)</h3><p>Identifikasi dan pahami kondisi saat ini dari data klaster Anda...</p></div>
+            <div class="step-item"><h3>Problem Analysis (Analisis Masalah)</h3><p>Setelah situasi dipahami, fokus pada potensi masalah atau anomali...</p></div>
+            <div class="step-item"><h3>Decision Analysis (Analisis Keputusan)</h3><p>Evaluasi opsi-opsi berdasarkan wawasan yang diperoleh dari klaster...</p></div>
+            <div class="step-item"><h3>Potential Problem Analysis (Analisis Potensi Masalah)</h3><p>Antisipasi dan mitigasi risiko yang mungkin timbul...</p></div>
         </div>
-
         <h3>Coba Chatbot SAPADAPA Kami!</h3>
         <p>Unggah data CSV Anda untuk bertanya tentang isi datanya, atau tanyakan apa pun kepada AI tentang analisis data dan konsep umum.</p>
-        
-        <div id="chatBox">
-            </div>
+        <div id="chatBox"></div>
         <div class="chat-controls">
-            
             <input type="text" id="chatInput" placeholder="Tanyakan apa saja atau upload data Anda..." />
-            <button class="upload-plus-button" onclick="openUploadModal()" aria-label="Upload Data">
-                <i class="fas fa-plus"></i>
-            </button>
+            <button class="upload-plus-button" onclick="openUploadModal()" aria-label="Upload Data"><i class="fas fa-plus"></i></button>
             <button onclick="sendMessage()">Kirim</button>
-            <button class="reset-chat-button" onclick="resetChat()" aria-label="Reset Chat">
-                <i class="fas fa-redo"></i> </button>
+            <button class="reset-chat-button" onclick="resetChat()" aria-label="Reset Chat"><i class="fas fa-redo"></i></button>
         </div>
-
         <a href="{{ url_for('main_app') }}" class="back-button">Mulai Klasterisasi</a>
     </div>
-
     <footer class="footer">
         <div class="footer-content">
             <p>&copy; 2025 Aurinova. All rights reserved.</p>
@@ -485,129 +195,94 @@
             </div>
         </div>
     </footer>
-
     <div id="uploadModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeUploadModal()">&times;</span>
             <h2>Unggah Data Anda</h2>
             <p>Upload data CSV Anda di sini agar AI dapat membantu menjawab pertanyaan mengenai isi data tersebut.</p>
-
             <label for="modalFileInput">Pilih File CSV:</label>
             <input type="file" id="modalFileInput" accept=".csv" onchange="loadModalCSVHeaders()" />
-            
             <button onclick="uploadDataFromModal()">Unggah Data</button>
             <p id="uploadStatus" style="color: red; margin-top: 10px;"></p>
         </div>
     </div>
-
-
     <script>
-        let currentSessionId = localStorage.getItem('aurinovaSessionId');
+        let currentSessionId = localStorage.getItem('aurinovaSapadapaSessionId');
         if (!currentSessionId) {
-            currentSessionId = 'sapadapa_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            localStorage.setItem('aurinovaSessionId', currentSessionId);
+            currentSessionId = 'sapadapa_' + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('aurinovaSapadapaSessionId', currentSessionId);
         }
         
         let detectedDelimiter = ',';
 
-        window.onload = function() {
-            appendMessage('bot', 'Halo! Saya Nova, asisten AI dari Aurinova.');
-            loadCachedData(); // Mencoba memuat data cache saat halaman dimuat
-        };
+        window.onload = function() { loadCachedData(); };
 
         async function loadCachedData() {
             try {
                 const response = await fetch(`/get_cached_data/${currentSessionId}`);
                 if (response.ok) {
                     const data = await response.json();
-                    
                     if (data.chat_history && data.chat_history.length > 0) {
-                        data.chat_history.forEach(turn => {
-                            appendMessage('user', turn.user);
-                            appendMessage('bot', turn.bot);
-                        });
+                        data.chat_history.forEach(turn => appendMessage(turn.user ? 'user' : 'bot', turn.user || turn.bot));
+                    } else {
+                        appendMessage('bot', 'Halo! Saya Nova, asisten AI dari Aurinova. Anda bisa bertanya apa saja.');
                     }
-
-                    if (data.raw_data_head) {
-                         if (!data.chat_history || data.chat_history.length === 0) {
-                            appendMessage('bot', 'Saya mendeteksi data yang telah Anda unggah sebelumnya. Sekarang Anda bisa bertanya tentang data ini.');
-                         }
-                    }
+                } else {
+                     appendMessage('bot', 'Halo! Saya Nova, asisten AI dari Aurinova. Anda bisa bertanya apa saja.');
                 }
             } catch (error) {
                 console.error("Failed to load cached data:", error);
+                appendMessage('bot', 'Halo! Saya Nova, asisten AI dari Aurinova.');
             }
         }
 
         function appendMessage(sender, message) {
             const chatBox = document.getElementById('chatBox');
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-
-            if (sender === 'user') {
-                messageDiv.classList.add('user');
+            messageDiv.classList.add('message', sender);
+            
+            if (sender === 'bot') {
+                const contentWrapper = document.createElement('div');
+                contentWrapper.className = 'bot-content';
+                contentWrapper.innerHTML = marked.parse(message.trim());
+                messageDiv.appendChild(contentWrapper);
+            } else {
                 messageDiv.textContent = message;
-            } else { // Handles 'bot' and 'agent'
-                messageDiv.classList.add('bot');
-                // Use .trim() to remove potential leading/trailing newlines from AI response
-                const cleanedMessage = message.trim();
-                messageDiv.innerHTML = marked.parse(cleanedMessage);
             }
-
             chatBox.appendChild(messageDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        let loadingMessageDiv = null;
-
         function showLoadingIndicator() {
-            const chatBox = document.getElementById('chatBox');
-            // Check if a loading indicator already exists
             if (document.querySelector('.loading-indicator')) return;
-            
-            loadingMessageDiv = document.createElement('div');
-            loadingMessageDiv.classList.add('message', 'bot', 'loading-indicator');
-            loadingMessageDiv.innerHTML = `
-                <span></span>
-                <span></span>
-                <span></span>
-            `;
+            const chatBox = document.getElementById('chatBox');
+            const loadingMessageDiv = document.createElement('div');
+            loadingMessageDiv.classList.add('message', 'loading-indicator');
+            loadingMessageDiv.innerHTML = `<span></span><span></span><span></span>`;
             chatBox.appendChild(loadingMessageDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function removeLoadingIndicator() {
-            const existingIndicator = document.querySelector('.loading-indicator');
-            if (existingIndicator) {
-                existingIndicator.parentNode.removeChild(existingIndicator);
-            }
-            loadingMessageDiv = null;
+            const indicator = document.querySelector('.loading-indicator');
+            if (indicator) indicator.remove();
         }
 
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text) return;
-
             appendMessage('user', text);
             input.value = '';
-
             showLoadingIndicator();
-
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: text, context: 'sapadapa_chat', session_id: currentSessionId })
                 });
-
                 removeLoadingIndicator();
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error('Gagal terhubung ke AI Agent: ' + errorText);
-                }
-
+                if (!response.ok) throw new Error((await response.json()).reply || 'Gagal terhubung ke AI.');
                 const data = await response.json();
                 appendMessage('bot', data.reply);
             } catch (error) {
@@ -616,37 +291,20 @@
             }
         }
 
-        document.getElementById('chatInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        function openUploadModal() {
-            document.getElementById('uploadModal').style.display = 'flex';
-            document.getElementById('uploadStatus').textContent = '';
-            document.getElementById('modalFileInput').value = '';
-        }
-
-        function closeUploadModal() {
-            document.getElementById('uploadModal').style.display = 'none';
-        }
-
+        document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
+        
+        function openUploadModal() { document.getElementById('uploadModal').style.display = 'flex'; }
+        function closeUploadModal() { document.getElementById('uploadModal').style.display = 'none'; }
+        
         function loadModalCSVHeaders() {
             const input = document.getElementById('modalFileInput');
-            if (input.files.length === 0) return;
-
+            if (!input.files.length) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const firstLine = e.target.result.split('\n')[0];
-                if (firstLine.includes(';')) {
-                    detectedDelimiter = ';';
-                } else if (firstLine.includes('\t')) {
-                    detectedDelimiter = '\t';
-                } else {
-                    detectedDelimiter = ',';
-                }
+            reader.onload = e => {
+                const firstLine = e.target.result.split('\n')[0].trim();
+                if (firstLine.includes(';')) detectedDelimiter = ';';
+                else if (firstLine.includes('\t')) detectedDelimiter = '\t';
+                else detectedDelimiter = ',';
             };
             reader.readAsText(input.files[0]);
         }
@@ -655,8 +313,7 @@
             const fileInput = document.getElementById('modalFileInput');
             const uploadStatus = document.getElementById('uploadStatus');
             if (!fileInput.files.length) {
-                uploadStatus.textContent = 'Mohon pilih file CSV!';
-                return;
+                uploadStatus.textContent = 'Mohon pilih file CSV!'; return;
             }
             uploadStatus.textContent = 'Mengunggah...';
             const formData = new FormData();
@@ -668,83 +325,46 @@
                 if (!response.ok) throw new Error((await response.json()).error || 'Upload gagal.');
                 const data = await response.json();
                 closeUploadModal();
-                if (data.ai_question) {
-                    appendMessage('bot', data.ai_question); // Tampilkan pertanyaan proaktif dari AI
-                }
+                if (data.ai_question) appendMessage('bot', data.ai_question);
             } catch (error) {
                 uploadStatus.textContent = 'Error: ' + error.message;
             }
         }
 
         async function resetChat() {
-            // Use a custom modal for confirmation instead of window.confirm
-            const userIsSure = await showCustomConfirm("Apakah Anda yakin ingin mereset riwayat chat dan data yang diunggah untuk sesi ini?");
-            if (!userIsSure) {
-                return;
-            }
-
+            const userIsSure = await showCustomConfirm("Anda yakin ingin mereset chat dan data?");
+            if (!userIsSure) return;
             document.getElementById('chatBox').innerHTML = '';
-            
-            const oldSessionId = currentSessionId; 
-            currentSessionId = 'sapadapa_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            localStorage.setItem('aurinovaSessionId', currentSessionId);
-            
+            const oldSessionId = currentSessionId;
+            currentSessionId = 'sapadapa_' + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('aurinovaSapadapaSessionId', currentSessionId);
             try {
-                await fetch('/reset_session', { 
+                await fetch('/reset_session', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ session_id: oldSessionId })
                 });
-            } catch (error) {
-                console.error("Error communicating with backend for session reset:", error);
-            }
-
-            appendMessage('bot', 'Halo! Saya Nova, asisten AI dari Aurinova. Sesi chat telah direset!');
+            } catch (error) { console.error("Gagal mereset sesi di backend:", error); }
+            appendMessage('bot', 'Sesi telah direset. Halo! Saya Nova.');
         }
 
-        // Custom confirm dialog function
         function showCustomConfirm(message) {
             return new Promise(resolve => {
                 const confirmBox = document.createElement('div');
-                confirmBox.style.cssText = `
-                    position: fixed;
-                    top: 0; left: 0; right: 0; bottom: 0;
-                    background-color: rgba(0,0,0,0.5);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 2000;
-                `;
-
+                confirmBox.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000;`;
                 const contentBox = document.createElement('div');
-                contentBox.style.cssText = `
-                    background: white;
-                    padding: 25px;
-                    border-radius: 10px;
-                    text-align: center;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-                `;
-
+                contentBox.style.cssText = `background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3);`;
                 const messageP = document.createElement('p');
                 messageP.textContent = message;
                 messageP.style.marginBottom = '20px';
-
                 const btnYes = document.createElement('button');
                 btnYes.textContent = 'Ya, Reset';
                 btnYes.style.marginRight = '10px';
-                btnYes.onclick = () => {
-                    document.body.removeChild(confirmBox);
-                    resolve(true);
-                };
-
+                btnYes.onclick = () => { document.body.removeChild(confirmBox); resolve(true); };
                 const btnNo = document.createElement('button');
                 btnNo.textContent = 'Batal';
                 btnNo.style.backgroundColor = '#6c757d';
-                btnNo.onclick = () => {
-                    document.body.removeChild(confirmBox);
-                    resolve(false);
-                };
-                
+                btnNo.onclick = () => { document.body.removeChild(confirmBox); resolve(false); };
                 contentBox.appendChild(messageP);
                 contentBox.appendChild(btnYes);
                 contentBox.appendChild(btnNo);

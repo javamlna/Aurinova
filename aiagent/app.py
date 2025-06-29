@@ -145,8 +145,8 @@ def main_app():
 def chat():
     data = request.json
     user_message = data.get('message', '')
-    chat_context = data.get('context', 'general') # Akan menjadi 'clustering_result' dari index.html
-    session_id = data.get('session_id') # Sekarang kita mengharapkan session_id
+    chat_context = data.get('context', 'general') 
+    session_id = data.get('session_id') 
 
     if not session_id:
         return jsonify({'reply': "Error: ID Sesi tidak ditemukan. Mohon refresh halaman."}), 400
@@ -164,48 +164,42 @@ def chat():
 
     # Format riwayat obrolan untuk prompt
     formatted_history = "\n".join([f"User: {turn['user']}\nAI: {turn['bot']}" for turn in chat_history])
-
-    prompt = "" # Inisialisasi prompt
+    prompt = "" 
     
     # Logika untuk konteks halaman SAPADAPA
     if chat_context == 'sapadapa_chat':
-        prompt = f"""
-        Anda adalah AI Agent Aurinova.
-        Riwayat percakapan:
-        {formatted_history if formatted_history else "Tidak ada."}
-        
-        Konteks data (jika ada):
-        {raw_data_head if raw_data_head else "Tidak ada data."}
-
-        User bertanya: "{user_message}"
-        AI:
-        """
-    # Logika untuk konteks halaman utama (index.html)
-    else: # Default ke konteks hasil klasterisasi
-        if not clustering_summary:
-            prompt = f"User bertanya '{user_message}', tapi belum ada hasil klasterisasi. Beri tahu user untuk mengunggah file dan menjalankan analisis terlebih dahulu."
-        else:
-            prompt = f"""
-            Anda adalah AI yang menganalisis hasil klasterisasi.
-            Berikut ringkasan hasil klasterisasi:
-            {clustering_summary}
-
-            Riwayat percakapan sebelumnya:
-            {formatted_history if formatted_history else "Tidak ada."}
-
-            User bertanya: "{user_message}"
-            AI: Jawab berdasarkan ringkasan dan riwayat di atas.
+        # 1. Check for "SAPADAPA" keyword first
+        if 'sapadapa' in user_message.lower():
+            prompt = """
+            Anda adalah AI Agent Aurinova. User bertanya secara spesifik tentang SAPADAPA.
+            Jelaskan secara ringkas dan jelas keempat tahap dari kerangka kerja SAPADAPA:
+            1.  **Situation Analysis (Analisis Situasi):** Jelaskan tujuannya untuk memahami konteks 'apa yang terjadi?'.
+            2.  **Problem Analysis (Analisis Masalah):** Jelaskan tujuannya untuk menemukan akar penyebab 'mengapa ini terjadi?'.
+            3.  **Decision Analysis (Analisis Keputusan):** Jelaskan tujuannya untuk memilih tindakan terbaik 'apa yang harus kita lakukan?'.
+            4.  **Potential Problem Analysis (Analisis Potensi Masalah):** Jelaskan tujuannya untuk mengantisipasi risiko 'apa yang mungkin salah nanti?'.
+            Tutup dengan ajakan untuk mendiskusikan salah satu tahap.
+            AI:
             """
+        # 2. If no keyword, check if data exists
+        elif current_session_data.get("raw_data_head"):
+            raw_data_head = current_session_data.get("raw_data_head")
+            prompt = f"Anda adalah AI Agent Aurinova. Konteks data user:\n---\n{raw_data_head}\n---\nRiwayat percakapan:\n{formatted_history}\n\nJawab pertanyaan user: \"{user_message}\" berdasarkan data dan riwayat tersebut."
+        # 3. If no data and no keyword, act as a general-purpose AI
+        else:
+            prompt = f"Anda adalah AI Agent Aurinova yang serba bisa. Riwayat percakapan:\n{formatted_history}\n\nJawab pertanyaan umum dari user: \"{user_message}\". Anda belum memiliki akses ke data apa pun."
+
+    # --- Logic for the main clustering app page (index.html) ---
+    else: 
+        clustering_summary = current_session_data.get("summary")
+        if not clustering_summary:
+            prompt = f"User bertanya '{user_message}', tapi belum ada hasil klasterisasi. Beri tahu user untuk mengunggah file dan menjalankan analisis."
+        else:
+            prompt = f"Anda adalah AI yang menganalisis hasil klasterisasi. Ringkasan:\n{clustering_summary}\n\nRiwayat percakapan:\n{formatted_history}\n\nJawab pertanyaan user: \"{user_message}\"\nAI:"
             
     ai_reply = query_openrouter(prompt)
-
-    # Simpan pertanyaan dan jawaban baru ke dalam riwayat
     chat_history.append({"user": user_message, "bot": ai_reply})
     current_session_data["chat_history"] = chat_history
-    
-    # Simpan kembali data sesi yang sudah diperbarui ke cache
     session_data_cache[session_id] = current_session_data
-
     return jsonify({'reply': ai_reply})
 
 @app.route('/upload_for_sapadapa', methods=['POST'])
@@ -214,34 +208,24 @@ def upload_for_sapadapa():
     if not session_id:
         return jsonify({'error': 'Session ID is required'}), 400
 
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+    if 'file' not in request.files: return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-
+    if file.filename == '': return jsonify({'error': 'No selected file'}), 400
     try:
-        # Simpan file asli untuk sesi ini
         original_csv_path = os.path.join(UPLOAD_FOLDER, f'original_data_{session_id}.csv')
         file.save(original_csv_path)
 
         file_delimiter = request.form.get('delimiter', ',')
         df = pd.read_csv(original_csv_path, encoding='utf-8', sep=file_delimiter)
         
-        # Simpan hanya informasi yang dibutuhkan Sapadapa ke cache
         session_data_cache[session_id] = {
             "raw_data_head": df.head(5).to_string(),
             "original_csv_url": f'/download/original_csv/{session_id}',
-            "summary": "Data telah diunggah. Silakan ajukan pertanyaan.",
-            "chat_history": [] # Reset riwayat chat saat data baru diunggah
+            "chat_history": []
         }
+        ai_question = "Data Anda berhasil diunggah. Mari kita analisis menggunakan kerangka SAPADAPA. Apakah Anda ingin memulai dengan **Analisis Situasi** untuk memahami gambaran umum data Anda?"
         
-        return jsonify({
-            'success': True,
-            'message': 'Data berhasil diunggah. AI siap menjawab pertanyaan umum tentang data Anda.',
-            'raw_data_head': df.head(5).to_string(),
-            'session_id': session_id
-        })
+        return jsonify({ 'success': True, 'ai_question': ai_question })
 
     except Exception as e:
         return jsonify({'error': f'Gagal memproses file: {str(e)}'}), 500
@@ -259,7 +243,6 @@ def upload_file():
         return jsonify({'error': 'No selected file'}), 400
 
     try:
-        # Setup path unik untuk hasil analisis
         unique_id = str(uuid.uuid4())
         img_path = os.path.join(RESULT_FOLDER, f'cluster_plot_{unique_id}.png')
         result_csv_path = os.path.join(RESULT_FOLDER, f'clustered_data_{unique_id}.csv')
@@ -375,7 +358,7 @@ def get_cached_data(session_id):
             'summary': cached_data.get('summary', ''),
             'last_plot_uid': cached_data.get('last_plot_uid'),
             'original_csv_url': cached_data.get('original_csv_url'),
-            'chat_history': cached_data.get('chat_history', []) # <-- TAMBAHKAN INI
+            'chat_history': cached_data.get('chat_history', [])
         })
     return jsonify({'error': 'Data not found in cache for this session.'}), 404
 

@@ -128,83 +128,55 @@
             margin-bottom: 20px;
         }
 
-        /* ============================================== */
-        /* === SOLUSI DEFINITIF UNTUK CHATBOT STYLING === */
-        /* ============================================== */
-
-        /* 1. Aturan dasar untuk SEMUA bubble chat */
         .message {
-            max-width: 75%;
-            padding: 10px 15px;
-            border-radius: 18px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+            max-width: 75%; padding: 10px 15px; border-radius: 18px;
+            white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
         }
+        .message.user { align-self: flex-end; background-color: #DCF8C6; color: #000; border-bottom-right-radius: 4px; }
+        .message.bot { align-self: flex-start; background-color: #F1F0F0; color: #000; border-bottom-left-radius: 4px; text-align: left; }
 
-        /* 2. Aturan untuk bubble PENGGUNA (USER) */
-        .message.user {
-            align-self: flex-end;
-            background-color: #DCF8C6;
-            color: #000;
-            border-bottom-right-radius: 4px;
-        }
-
-        /* 3. Aturan untuk bubble BOT - menjadi Flex Container */
-        .message.bot {
-            align-self: flex-start;
-            background-color: #F1F0F0;
-            color: #000;
-            border-bottom-left-radius: 4px;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 8px; /* Jarak KONSISTEN antar elemen */
-        }
-
-        /*
-        * 4. PERBAIKAN UNTUK LOADING INDICATOR
-        * Aturan ini lebih spesifik, sehingga akan menimpa aturan .message.bot di atas
-        * HANYA untuk bubble loading.
-        */
-        .message.bot.loading-indicator {
-            flex-direction: row; /* Paksa kembali menjadi horizontal */
-            align-items: center; /* Pusatkan titik-titik secara vertikal */
-            gap: 4px; /* Jarak antar titik */
-        }
-
-        /*
-        * 5. PERBAIKAN UNTUK GAP (Reset Agresif)
-        * Menargetkan semua elemen ('*') di dalam bubble bot dan hapus margin/padding bawaan mereka.
-        */
         .message.bot * {
-            margin: 0;
-            padding: 0;
-            line-height: 1.5; /* Tinggi baris yang konsisten untuk semua teks */
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.5; 
         }
 
-        /*
-        * 6. Aturan Spesifik SETELAH Reset
-        * Tambahkan kembali padding yang diperlukan agar list terlihat benar.
-        */
+        .message.bot p,
+        .message.bot ul,
+        .message.bot ol,
+        .message.bot h1,
+        .message.bot h2,
+        .message.bot h3,
+        .message.bot h4,
+        .message.bot h5,
+        .message.bot h6 {
+            margin-bottom: 12px !important; 
+        }
+        
+        .message.bot > *:last-child {
+            margin-bottom: 0 !important;
+        }
+
         .message.bot ul,
         .message.bot ol {
-            padding-left: 20px; /* Ruang untuk bullet/nomor */
+            padding-left: 20px !important; 
+            list-style-position: outside;
         }
 
         .message.bot li {
-            margin-bottom: 5px; /* Jarak kecil antar item list */
+            margin-bottom: 5px !important; /* Jarak antar item di dalam list */
         }
         
-        /* Loading indicator styling (titik-titik) */
+        .message.bot.loading-indicator {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+        }
+
         .loading-indicator span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background-color: #555;
-            border-radius: 50%;
-            opacity: 0;
-            animation: blink 1.4s infinite ease-in-out;
+            display: inline-block; width: 6px; height: 6px; background-color: #555;
+            border-radius: 50%; opacity: 0; animation: blink 1.4s infinite ease-in-out;
         }
 
         .loading-indicator span:nth-child(1) { animation-delay: 0s; }
@@ -682,38 +654,25 @@
         async function uploadDataFromModal() {
             const fileInput = document.getElementById('modalFileInput');
             const uploadStatus = document.getElementById('uploadStatus');
-            uploadStatus.textContent = 'Mengunggah data...';
-
-            if (fileInput.files.length === 0) {
-                uploadStatus.textContent = 'Mohon pilih file CSV terlebih dahulu!';
+            if (!fileInput.files.length) {
+                uploadStatus.textContent = 'Mohon pilih file CSV!';
                 return;
             }
-
-            const file = fileInput.files[0];
+            uploadStatus.textContent = 'Mengunggah...';
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', fileInput.files[0]);
             formData.append('delimiter', detectedDelimiter);
             formData.append('session_id', currentSessionId);
-
             try {
-                const response = await fetch('/upload_for_sapadapa', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Upload gagal');
-                }
-
+                const response = await fetch('/upload_for_sapadapa', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error((await response.json()).error || 'Upload gagal.');
                 const data = await response.json();
-                
                 closeUploadModal();
-                appendMessage('bot', data.message || 'Data Anda berhasil diunggah! Sekarang Anda bisa bertanya tentang data ini.');
-
+                if (data.ai_question) {
+                    appendMessage('bot', data.ai_question); // Tampilkan pertanyaan proaktif dari AI
+                }
             } catch (error) {
                 uploadStatus.textContent = 'Error: ' + error.message;
-                console.error("Upload Error:", error);
             }
         }
 
